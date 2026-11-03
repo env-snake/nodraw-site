@@ -1,737 +1,1070 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en" dir="ltr" class="client-js">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NoDraw — Next-gen Level Editor for Source Engine</title>
-<meta name="description" content="NoDraw — полноценный современный редактор карт для Source Engine и Garry's Mod на Rust и WebGPU. Прямой преемник Hammer++ без устаревшего legacy-балласта.">
-<meta property="og:title" content="NoDraw — Next-gen Source Engine Map Editor">
-<meta property="og:description" content="Редактор карт нового поколения: честный превью-свет Halton 162 rays, субпиксельный Stencil Outline, точные коллизии .PHY и встроенный Pack.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://env-snake.github.io/nodraw-site/">
-<meta property="og:image" content="assets/preview_lighting.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoDraw - Valve Developer Community</title>
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Unbounded:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="description" content="NoDraw — Next-gen Level Editor for Source Engine and Garry's Mod built with Rust and WebGPU.">
 
 <style>
+  /* ==========================================================================
+     Valve Developer Community (VDC) MediaWiki Vector Theme
+     ========================================================================== */
   :root {
-    --bg: #07090e;
-    --bg-2: #0e121a;
-    --bg-card: #131822;
-    --bg-card-hover: #19202e;
-    --line: #202738;
-    --line-active: #f5c518;
-    --text: #eef3f9;
-    --muted: #91a0b5;
-    --accent: #f5c518;
-    --accent-2: #d4a017;
-    --accent-soft: rgba(245, 197, 24, 0.12);
-    --accent-glow: rgba(245, 197, 24, 0.28);
-    --radius: 12px;
-    --gutter: clamp(16px, 4vw, 56px);
+    --vdc-bg: #f6f6f6;
+    --vdc-content-bg: #ffffff;
+    --vdc-text: #202122;
+    --vdc-text-muted: #54595d;
+    --vdc-border: #a7d7f9;
+    --vdc-border-subtle: #a2a9b1;
+    --vdc-link: #0645ad;
+    --vdc-link-visited: #0b0080;
+    --vdc-link-red: #ba0000;
+    --vdc-tab-bg: #f8f9fa;
+    --vdc-tab-border: #a7d7f9;
+    --vdc-toc-bg: #f8f9fa;
+    --vdc-toc-border: #a2a9b1;
+    --vdc-infobox-bg: #f8f9fa;
+    --vdc-infobox-border: #a2a9b1;
+    --vdc-infobox-header: #e0e9f5;
+    --vdc-accent-gold: #f5c518;
+    --vdc-valve-orange: #f37321;
+    --vdc-code-bg: #f8f9fa;
+    --vdc-code-border: #eaecf0;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  /* Dark mode toggleable */
+  body.dark-theme {
+    --vdc-bg: #0c0f14;
+    --vdc-content-bg: #131720;
+    --vdc-text: #e2e8f0;
+    --vdc-text-muted: #94a3b8;
+    --vdc-border: #232d3f;
+    --vdc-border-subtle: #2d3748;
+    --vdc-link: #f5c518;
+    --vdc-link-visited: #e5a910;
+    --vdc-tab-bg: #1a202c;
+    --vdc-tab-border: #2d3748;
+    --vdc-toc-bg: #1a202c;
+    --vdc-toc-border: #2d3748;
+    --vdc-infobox-bg: #1a202c;
+    --vdc-infobox-border: #2d3748;
+    --vdc-infobox-header: #263143;
+    --vdc-code-bg: #1e2533;
+    --vdc-code-border: #2d3748;
+  }
+
+  * { box-sizing: border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Manrope", system-ui, sans-serif;
-    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Lato, Helvetica, Arial, sans-serif;
+    font-size: 0.875em;
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    position: relative;
-  }
-  a { color: inherit; text-decoration: none; }
-  img { display: block; max-width: 100%; }
-
-  /* Background Grid Overlay */
-  .bg-grid {
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .bg-glow {
-    position: fixed;
-    top: -200px; left: 50%; transform: translateX(-50%);
-    width: 1000px; height: 600px;
-    background: radial-gradient(ellipse at center, rgba(245, 197, 24, 0.10) 0%, rgba(212, 160, 23, 0.03) 50%, transparent 80%);
-    filter: blur(100px);
-    pointer-events: none;
-    z-index: 0;
+    color: var(--vdc-text);
+    background-color: var(--vdc-bg);
   }
 
-  /* ---------- Header ---------- */
-  .topbar {
-    position: fixed; inset: 0 0 auto 0; z-index: 30;
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    padding: 16px var(--gutter);
-    background: linear-gradient(to bottom, rgba(7, 9, 14, 0.92), rgba(7, 9, 14, 0));
-    transition: background 0.25s, border-color 0.25s;
+  a { color: var(--vdc-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:visited { color: var(--vdc-link-visited); }
+
+  /* Top Background Strips */
+  #mw-page-base {
+    height: 5em;
+    background-color: var(--vdc-content-bg);
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.06), transparent 50px);
+    border-bottom: 1px solid var(--vdc-border-subtle);
   }
-  .topbar.solid {
-    background: rgba(7, 9, 14, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
-  }
-  .brand {
-    display: flex; align-items: center; gap: 12px;
-    font-family: "Unbounded", sans-serif; font-weight: 700; font-size: 17px;
-    letter-spacing: 0.02em;
-  }
-  .brand img {
-    width: 32px; height: 32px; border-radius: 8px;
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-  .brand b { color: var(--accent); font-weight: inherit; }
-  .brand .version-tag {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
-    color: var(--accent); background: var(--accent-soft);
-    border: 1px solid rgba(245, 197, 24, 0.35);
-    padding: 2px 7px; border-radius: 999px;
+  #mw-head-base {
+    margin-top: -5em;
+    height: 5em;
   }
 
-  .nav { display: flex; align-items: center; gap: 24px; }
-  .nav-link {
-    font-size: 14px; font-weight: 600; color: var(--muted);
-    transition: color 0.2s;
-  }
-  .nav-link:hover { color: var(--text); }
-  .nav a.nav-cta {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: #080a0f; font-size: 13px; font-weight: 700;
-    padding: 8px 18px; border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 2px 12px var(--accent-glow);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .nav a.nav-cta:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(245, 197, 24, 0.5);
+  /* Main Container Layout */
+  #content {
+    margin-left: 11em;
+    padding: 1.25em 2em 2em 2em;
+    background-color: var(--vdc-content-bg);
+    border: 1px solid var(--vdc-border-subtle);
+    border-right-width: 0;
+    border-top-width: 0;
+    min-height: 90vh;
   }
 
-  /* ---------- Hero ---------- */
-  .hero {
-    position: relative; min-height: 92vh; min-height: 92svh;
-    display: flex; align-items: flex-end;
-    padding: 130px var(--gutter) clamp(48px, 8vh, 88px);
-    background: #000 url("assets/preview_lighting.png") center/cover no-repeat;
-  }
-  .hero::before {
-    content: ""; position: absolute; inset: 0;
-    background:
-      linear-gradient(to top, var(--bg) 0%, rgba(7, 9, 14, 0.82) 35%, rgba(7, 9, 14, 0.25) 70%, rgba(7, 9, 14, 0.70) 100%);
-  }
-  .hero-inner { position: relative; max-width: 880px; z-index: 1; }
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); margin: 0 0 16px;
-    font-family: "JetBrains Mono", monospace;
-  }
-  .hero h1 {
-    font-family: "Unbounded", sans-serif; font-weight: 800;
-    font-size: clamp(38px, 6.2vw, 76px); line-height: 1.04;
-    letter-spacing: -0.02em; margin: 0 0 20px;
-  }
-  .hero-lead {
-    font-size: clamp(16px, 1.4vw, 19px); color: #cbd5e1;
-    max-width: 680px; line-height: 1.6; margin: 0 0 32px;
-  }
-  .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; }
-  .btn-download {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: "Manrope", sans-serif; font-size: 15px; font-weight: 700;
-    color: #080a0f; background: var(--accent);
-    padding: 12px 24px; border-radius: 999px;
-    box-shadow: 0 4px 24px var(--accent-glow);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-download:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 32px rgba(245, 197, 24, 0.55);
-  }
-  .btn-download .ico { width: 18px; height: 18px; }
-  .hero-sublink {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 14px; font-weight: 600; color: var(--muted);
-    transition: color 0.2s;
-  }
-  .hero-sublink:hover { color: var(--text); }
-  .hero-sublink svg { width: 16px; height: 16px; color: var(--accent); }
-
-  /* ---------- Content & Sections ---------- */
-  main {
-    position: relative; z-index: 1;
-    padding: 0 var(--gutter); max-width: 1400px; margin: 0 auto;
-  }
-  .section { padding: clamp(60px, 8vw, 110px) 0 20px; scroll-margin-top: 80px; }
-  .section-head {
-    display: grid; gap: 10px; margin-bottom: clamp(32px, 5vw, 56px);
-    border-top: 1px solid var(--line); padding-top: 32px;
-  }
-  .section-num {
-    font-family: "Unbounded", sans-serif; font-size: 12px; font-weight: 700;
-    color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
-  }
-  .section-head h2 {
-    font-family: "Unbounded", sans-serif; font-weight: 700;
-    font-size: clamp(26px, 4vw, 44px); line-height: 1.15; margin: 0;
-  }
-  .section-head p { color: var(--muted); margin: 0; max-width: 720px; font-size: 16px; }
-
-  /* Gallery Cards in Synapse Style */
-  .gallery-grid {
-    display: grid; gap: 18px;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
-    margin-bottom: 40px;
-  }
-  .gallery-item {
-    all: unset; cursor: zoom-in; position: relative;
-    border-radius: var(--radius); overflow: hidden;
-    aspect-ratio: 16/9; background: var(--bg-2);
-    border: 1px solid var(--line);
-    transition: border-color 0.25s, transform 0.25s;
-  }
-  .gallery-item:hover {
-    border-color: var(--accent);
-    transform: translateY(-3px);
-  }
-  .gallery-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .gallery-item img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.5s ease, filter 0.3s;
-  }
-  .gallery-item:hover img { transform: scale(1.04); filter: brightness(1.06); }
-  .gallery-item .cap {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    display: flex; flex-direction: column; gap: 4px;
-    padding: 32px 18px 14px; font-weight: 600; font-size: 14px; color: #fff;
-    background: linear-gradient(to top, rgba(7, 9, 14, 0.92) 0%, rgba(7, 9, 14, 0) 100%);
-    pointer-events: none;
-  }
-  .gallery-item .cap b {
-    font-family: "Unbounded", sans-serif; font-size: 11px;
-    color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;
+  /* Header Navigation */
+  #mw-head {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
   }
 
-  /* Feature Grid Cards */
-  .feature-grid {
-    display: grid; gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  #p-personal {
+    position: absolute;
+    top: 6px;
+    right: 1.5em;
+    font-size: 0.75em;
   }
-  .feature-card {
-    background: var(--bg-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 30px 28px;
-    display: flex; flex-direction: column; gap: 14px;
-    transition: border-color 0.2s, transform 0.2s;
-  }
-  .feature-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-  .feature-num {
-    font-family: "Unbounded", sans-serif; font-size: 13px; font-weight: 700;
-    color: var(--accent); letter-spacing: 0.1em;
-  }
-  .feature-card h3 {
-    font-family: "Unbounded", sans-serif; font-weight: 500; font-size: 20px;
-    line-height: 1.25; color: #fff;
-  }
-  .feature-card p {
-    color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0;
-  }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 10px; }
-  .tag {
-    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 600;
-    color: var(--accent); border: 1px solid rgba(245, 197, 24, 0.35);
-    background: var(--accent-soft); padding: 3px 10px; border-radius: 999px;
-  }
-
-  /* Comparison Section */
-  .compare-box {
-    background: var(--bg-2);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .compare-table {
-    width: 100%; border-collapse: collapse; text-align: left;
-  }
-  .compare-table th {
-    padding: 18px 24px; font-family: "Unbounded", sans-serif; font-size: 12px;
-    font-weight: 700; color: var(--muted); letter-spacing: 0.08em;
-    text-transform: uppercase; border-bottom: 1px solid var(--line); background: rgba(0,0,0,0.2);
-  }
-  .compare-table td {
-    padding: 18px 24px; font-size: 14px; border-bottom: 1px solid rgba(32, 39, 56, 0.6);
-  }
-  .compare-table tr:last-child td { border-bottom: none; }
-  .badge-hplus { color: var(--muted); }
-  .badge-nodraw { color: var(--accent); font-weight: 700; }
-
-  /* Tester Download Section */
-  .tester-box {
-    background: linear-gradient(135deg, rgba(245, 197, 24, 0.08) 0%, rgba(14, 18, 26, 0.95) 50%);
-    border: 1px solid rgba(245, 197, 24, 0.35);
-    border-radius: var(--radius);
-    padding: clamp(32px, 6vw, 60px) clamp(24px, 5vw, 56px);
-    display: grid; gap: 24px;
+  #p-personal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 14px;
     align-items: center;
   }
-  .tester-content h3 {
-    font-family: "Unbounded", sans-serif; font-size: clamp(24px, 3.5vw, 36px);
-    font-weight: 700; margin-bottom: 12px;
-  }
-  .tester-content p { color: var(--muted); font-size: 15px; max-width: 720px; line-height: 1.6; }
-  .tester-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 10px; }
-  .meta-pills { display: flex; flex-wrap: wrap; gap: 10px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); margin-top: 8px; }
-  .meta-pill { background: var(--bg-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: 999px; }
 
-  /* Vertical Navigation Rail */
-  .rail { display: none; }
-  @media (min-width: 1200px) {
-    main { padding-right: max(var(--gutter), calc(220px - max(0px, (100vw - 1440px) / 2))); }
-    .rail {
-      display: block; position: fixed; z-index: 20; right: 28px; top: 50%; transform: translateY(-50%);
-      padding: 16px 18px; border-radius: 14px;
-      background: rgba(7, 9, 14, 0.7); backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .rail ol { list-style: none; margin: 0; padding: 0; }
-    .rail-track { position: absolute; right: 16px; top: 16px; bottom: 16px; width: 2px; background: var(--line); border-radius: 2px; }
-    .rail-fill { width: 100%; height: 0; background: var(--accent); border-radius: 2px; transition: height 0.15s linear; }
-    .rail a {
-      position: relative; display: flex; align-items: center; justify-content: flex-end; gap: 12px;
-      padding: 7px 0; text-decoration: none; color: var(--muted); transition: color 0.2s;
-    }
-    .rail a:hover { color: var(--text); }
-    .rail .lbl { font-size: 13px; font-weight: 600; white-space: nowrap; }
-    .rail .lbl b { font-family: "Unbounded", sans-serif; font-size: 10px; font-weight: 500; margin-right: 8px; color: var(--muted); }
-    .rail i { display: block; width: 12px; height: 2px; background: #2f3647; border-radius: 2px; transition: width 0.25s, background 0.25s; }
-    .rail a.active { color: var(--text); }
-    .rail a.active i { width: 26px; background: var(--accent); }
-    .rail a.active .lbl b { color: var(--accent); }
+  /* Tabs Navigation (Page, Discussion, Read, View Source, History) */
+  #left-navigation {
+    position: absolute;
+    left: 11em;
+    top: 2.5em;
+  }
+  #right-navigation {
+    position: absolute;
+    right: 1.5em;
+    top: 2.5em;
+    display: flex;
+    align-items: flex-end;
   }
 
-  /* Lightbox */
-  .lb { position: fixed; inset: 0; z-index: 60; background: rgba(4, 5, 8, 0.95); display: none; align-items: center; justify-content: center; }
-  .lb.open { display: flex; }
-  .lb img { max-width: calc(100vw - 40px); max-height: calc(100svh - 110px); border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
-  .lb-btn {
-    position: absolute; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff;
-    width: 48px; height: 48px; border-radius: 50%; font-size: 22px; cursor: pointer; display: grid; place-items: center;
-    transition: background 0.2s;
+  .vector-tabs {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
-  .lb-btn:hover { background: rgba(255,255,255,0.18); }
-  .lb-prev { left: 24px; top: 50%; transform: translateY(-50%); }
-  .lb-next { right: 24px; top: 50%; transform: translateY(-50%); }
-  .lb-close { right: 24px; top: 24px; }
-  .lb-caption { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 14px; color: var(--muted); }
+  .vector-tabs li {
+    margin: 0;
+    padding: 0;
+    background: var(--vdc-tab-bg);
+    border: 1px solid var(--vdc-border-subtle);
+    border-bottom: 0;
+    margin-right: -1px;
+    font-size: 0.8125em;
+    line-height: 1.125em;
+  }
+  .vector-tabs li a {
+    display: block;
+    padding: 0.6em 0.9em 0.5em 0.9em;
+    color: var(--vdc-link);
+    text-decoration: none;
+  }
+  .vector-tabs li.selected {
+    background: var(--vdc-content-bg);
+    border-top: 2px solid var(--vdc-accent-gold);
+    font-weight: bold;
+  }
+  .vector-tabs li.selected a { color: var(--vdc-text); }
+  .vector-tabs li.cta-tab {
+    background: var(--vdc-accent-gold);
+    border-color: #d4a017;
+  }
+  .vector-tabs li.cta-tab a {
+    color: #0b0f14;
+    font-weight: bold;
+  }
+
+  /* Search Box */
+  #p-search {
+    margin-left: 1em;
+    font-size: 0.8em;
+  }
+  .search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--vdc-border-subtle);
+    background: var(--vdc-content-bg);
+    border-radius: 2px;
+    padding: 2px;
+  }
+  .search-box input[type="text"] {
+    border: none;
+    padding: 4px 6px;
+    outline: none;
+    font-size: inherit;
+    background: transparent;
+    color: var(--vdc-text);
+  }
+  .search-box button {
+    background: #f8f9fa;
+    border: 1px solid var(--vdc-border-subtle);
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #202122;
+  }
+
+  /* Left Sidebar (#mw-panel) */
+  #mw-panel {
+    position: absolute;
+    top: 0;
+    width: 10.5em;
+    left: 0;
+    padding: 0.25em 0 0 0.5em;
+    font-size: 0.8125em;
+  }
+  #p-logo {
+    width: 10em;
+    height: 5em;
+    margin-bottom: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  #p-logo img {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(245, 197, 24, 0.4);
+  }
+  #p-logo .logo-txt {
+    font-family: "Unbounded", sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--vdc-text);
+    line-height: 1.1;
+  }
+  #p-logo .logo-txt span { color: var(--vdc-accent-gold); }
+
+  .portal {
+    margin-bottom: 1.5em;
+  }
+  .portal h3 {
+    font-size: 0.85em;
+    font-weight: bold;
+    color: var(--vdc-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--vdc-border-subtle);
+    padding: 0.25em 0;
+    margin: 0 0 0.4em 0;
+  }
+  .portal ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .portal li {
+    margin: 0.35em 0;
+  }
+  .portal li a {
+    color: var(--vdc-link);
+  }
+
+  /* Main Headings */
+  #firstHeading {
+    font-family: "Linux Libertine", Georgia, Times, serif;
+    font-size: 2em;
+    font-weight: normal;
+    border-bottom: 1px solid var(--vdc-border-subtle);
+    margin: 0 0 0.3em 0;
+    padding-bottom: 0.2em;
+    line-height: 1.2;
+    color: var(--vdc-text);
+  }
+  #siteSub {
+    font-size: 0.8em;
+    color: var(--vdc-text-muted);
+    margin-bottom: 1em;
+  }
+
+  h2 {
+    font-family: "Linux Libertine", Georgia, Times, serif;
+    font-size: 1.5em;
+    font-weight: normal;
+    border-bottom: 1px solid var(--vdc-border-subtle);
+    margin: 1.4em 0 0.5em 0;
+    padding-bottom: 0.15em;
+    color: var(--vdc-text);
+  }
+  h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 1.2em 0 0.3em 0;
+    color: var(--vdc-text);
+  }
+
+  /* Flag Translation Bar */
+  .lang-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1em;
+    background: #262626;
+    border: 1px solid #65635f;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: #fff;
+    align-items: center;
+  }
+  .lang-bar .current-lang {
+    background: rgba(255,255,255,0.2);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+  }
+
+  /* VDC Infobox */
+  .infobox {
+    float: right;
+    clear: right;
+    margin: 0 0 1em 1.5em;
+    width: 320px;
+    background: var(--vdc-infobox-bg);
+    border: 1px solid var(--vdc-infobox-border);
+    border-collapse: collapse;
+    font-size: 0.88em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .infobox th, .infobox td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--vdc-infobox-border);
+  }
+  .infobox-header {
+    background: var(--vdc-infobox-header);
+    font-weight: bold;
+    font-size: 1.15em;
+    text-align: center;
+    border-top: 3px solid var(--vdc-accent-gold);
+  }
+  .infobox-subheader {
+    text-align: center;
+    font-size: 0.9em;
+    background: rgba(0,0,0,0.03);
+    color: var(--vdc-text-muted);
+  }
+  .infobox-image {
+    text-align: center;
+    padding: 10px !important;
+    background: #000;
+  }
+  .infobox-image img {
+    margin: 0 auto;
+    border: 1px solid var(--vdc-border-subtle);
+    max-height: 180px;
+    object-fit: cover;
+  }
+  .infobox th {
+    text-align: left;
+    width: 35%;
+    color: var(--vdc-text-muted);
+    font-weight: 600;
+  }
+  .btn-download-box {
+    display: block;
+    background: var(--vdc-accent-gold);
+    color: #080a0f !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 3px;
+    margin: 6px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .btn-download-box:hover { text-decoration: none; filter: brightness(1.08); }
+
+  /* Table of Contents (TOC) */
+  .toc {
+    display: inline-block;
+    background-color: var(--vdc-toc-bg);
+    border: 1px solid var(--vdc-toc-border);
+    padding: 10px 18px;
+    margin: 1em 0;
+    min-width: 240px;
+    font-size: 95%;
+  }
+  .toctitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  .toctitle h2 {
+    font-size: 1em;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-family: inherit;
+    font-weight: bold;
+  }
+  .toctoggle {
+    font-size: 0.8em;
+    cursor: pointer;
+    color: var(--vdc-link);
+  }
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+  }
+  .toc ul ul {
+    padding-left: 1.5em;
+  }
+  .toc li {
+    margin: 0.25em 0;
+  }
+  .tocnumber {
+    color: var(--vdc-text-muted);
+    margin-right: 6px;
+    font-family: monospace;
+  }
+
+  /* Note / Tip / Bug Callout Boxes (VDC Style) */
+  .vdc-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0.7em 1em;
+    margin: 0.8em 0;
+    border-radius: 2px;
+    border-left: 4px solid;
+    font-size: 0.95em;
+  }
+  .vdc-note {
+    background: #fbfbee;
+    border-color: #9cb350;
+  }
+  .dark-theme .vdc-note {
+    background: #1c2214;
+    border-color: #a4c439;
+  }
+  .vdc-tip {
+    background: #f0f7fd;
+    border-color: #36c;
+  }
+  .dark-theme .vdc-tip {
+    background: #141f2d;
+    border-color: #4488ff;
+  }
+  .vdc-box b {
+    display: inline-block;
+    min-width: 48px;
+  }
+
+  /* Wikitable */
+  .wikitable {
+    background-color: var(--vdc-content-bg);
+    color: var(--vdc-text);
+    margin: 1em 0;
+    border: 1px solid var(--vdc-border-subtle);
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  .wikitable th {
+    background-color: rgba(0,0,0,0.05);
+    border: 1px solid var(--vdc-border-subtle);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: bold;
+  }
+  .wikitable td {
+    border: 1px solid var(--vdc-border-subtle);
+    padding: 8px 12px;
+  }
+  .wikitable tr:hover {
+    background-color: rgba(245, 197, 24, 0.05);
+  }
+
+  /* Keyboard keys */
+  .keyboard-key {
+    display: inline-block;
+    border: 1px solid #505050;
+    box-shadow: 0 2px 0 #505050;
+    border-radius: 3px;
+    background: #303030;
+    color: #fff;
+    margin: 0 0.2em;
+    padding: 1px 5px;
+    font-family: monospace, monospace;
+    font-size: 0.85em;
+  }
+
+  /* Definition list (Keyvalues, Inputs, Outputs) */
+  dl dt {
+    font-weight: bold;
+    margin-top: 0.8em;
+  }
+  dl dd {
+    margin-left: 2em;
+    margin-bottom: 0.5em;
+  }
+  kbd {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.9em;
+    background: var(--vdc-code-bg);
+    border: 1px solid var(--vdc-code-border);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Gallery Thumbs */
+  .thumb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 1em 0;
+  }
+  .thumb {
+    background: var(--vdc-toc-bg);
+    border: 1px solid var(--vdc-border-subtle);
+    padding: 6px;
+    border-radius: 2px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .thumb:hover {
+    transform: translateY(-2px);
+    border-color: var(--vdc-accent-gold);
+  }
+  .thumb img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border: 1px solid var(--vdc-border-subtle);
+  }
+  .thumbcaption {
+    font-size: 0.8em;
+    color: var(--vdc-text-muted);
+    padding: 6px 4px 2px;
+    text-align: left;
+  }
+
+  /* Category Links */
+  #catlinks {
+    margin-top: 2em;
+    padding: 7px 10px;
+    background-color: var(--vdc-toc-bg);
+    border: 1px solid var(--vdc-border-subtle);
+    font-size: 0.8em;
+    clear: both;
+  }
+  #catlinks ul {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #catlinks li {
+    display: inline;
+    margin-right: 8px;
+  }
+  #catlinks li:after {
+    content: " |";
+    color: var(--vdc-text-muted);
+  }
+  #catlinks li:last-child:after {
+    content: "";
+  }
 
   /* Footer */
-  footer {
-    border-top: 1px solid var(--line); margin-top: 60px; padding: 32px var(--gutter) 48px;
-    color: var(--muted); font-size: 14px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    position: relative; z-index: 1;
+  #footer {
+    margin-left: 11em;
+    padding: 1.25em 2em;
+    font-size: 0.75em;
+    color: var(--vdc-text-muted);
+    border-top: 1px solid var(--vdc-border-subtle);
   }
-  .foot-copy { all: unset; cursor: pointer; color: var(--muted); transition: color 0.2s; }
-  .foot-copy:hover { color: var(--accent); }
+  #footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #footer li {
+    margin: 0.4em 0;
+  }
 
-  @media (max-width: 768px) {
-    .nav-link { display: none; }
-    .hero { min-height: 80vh; }
-    .gallery-grid { grid-template-columns: 1fr; }
-    .compare-box { overflow-x: auto; }
+  /* Modal Lightbox */
+  .modal-lb {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.88);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-lb.active { display: flex; }
+  .modal-lb img {
+    max-width: 90vw;
+    max-height: 85vh;
+    border: 2px solid #555;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    #content { margin-left: 0; border-left: 0; padding: 1em; }
+    #mw-panel { display: none; }
+    #left-navigation { left: 1em; }
+    #footer { margin-left: 0; }
+    .infobox { float: none; width: 100%; margin: 1em 0; }
   }
 </style>
 </head>
 <body>
 
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
+<div id="mw-page-base"></div>
+<div id="mw-head-base"></div>
 
-<!-- Topbar Header -->
-<header class="topbar" id="topbar">
-  <a class="brand" href="#top">
+<!-- Left Sidebar (#mw-panel) -->
+<div id="mw-panel">
+  <a id="p-logo" href="#top">
     <img src="assets/logo.png" alt="NoDraw Logo">
-    <span>No<b>Draw</b></span>
-    <span class="version-tag">BETA 0.1.0</span>
+    <div class="logo-txt">No<span>Draw</span><br><small style="font-size:9px;color:gray;">VDC DOCS</small></div>
   </a>
-  <nav class="nav">
-    <a href="#showcase" class="nav-link">Шоукейс</a>
-    <a href="#features" class="nav-link">Технологии</a>
-    <a href="#compare" class="nav-link">Сравнение</a>
-    <a href="#download" class="nav-cta">
-      <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm9-4v8H3v-8H1v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-8h-2z"/></svg>
-      Скачать билд (.ZIP)
-    </a>
-  </nav>
-</header>
 
-<!-- Vertical Rail Navigation (Synapse Style) -->
-<nav class="rail" id="rail" aria-label="Разделы NoDraw">
-  <div class="rail-track"><div class="rail-fill" id="rail-fill"></div></div>
-  <ol>
-    <li><a href="#top" class="active"><span class="lbl"><b>00</b>Обзор</span><i></i></a></li>
-    <li><a href="#showcase"><span class="lbl"><b>01</b>Шоукейс</span><i></i></a></li>
-    <li><a href="#features"><span class="lbl"><b>02</b>Технологии</span><i></i></a></li>
-    <li><a href="#compare"><span class="lbl"><b>03</b>Сравнение</span><i></i></a></li>
-    <li><a href="#download"><span class="lbl"><b>04</b>Тестерам</span><i></i></a></li>
-  </ol>
-</nav>
-
-<!-- Hero Section -->
-<section class="hero" id="top">
-  <div class="hero-inner">
-    <p class="eyebrow">Next-gen Source Engine Level Editor</p>
-    <h1>NoDraw</h1>
-    <p class="hero-lead">
-      Полноценный современный редактор карт для Source Engine и Garry's Mod, спроектированный с нуля на Rust и WebGPU. 
-      Прямой преемник Hammer++ без устаревшего 32-битного legacy-кода.
-    </p>
-    <div class="hero-cta">
-      <a href="downloads/nodraw-beta-tester.zip" class="btn-download" download>
-        <svg class="ico" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm9-4v8H3v-8H1v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-8h-2z"/></svg>
-        Скачать закрытый билд (19.7 MB)
-      </a>
-      <a href="#showcase" class="hero-sublink">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        Смотреть рендеры и возможности
-      </a>
-    </div>
+  <div class="portal">
+    <h3>Navigation</h3>
+    <ul>
+      <li><a href="#top">Main Page</a></li>
+      <li><a href="#Overview">Overview</a></li>
+      <li><a href="#Features">Core Features</a></li>
+      <li><a href="#Comparison">Hammer++ vs NoDraw</a></li>
+      <li><a href="#Hotkeys">Keyboard Shortcuts</a></li>
+      <li><a href="#Download">Download Build</a></li>
+    </ul>
   </div>
-</section>
 
-<main id="content">
-  <!-- Section 01: Showcase -->
-  <section class="section" id="showcase">
-    <div class="section-head">
-      <span class="section-num">01 / Showcase</span>
-      <h2>Визуальный контроль</h2>
-      <p>Живые снимки реальных карт и моделей в NoDraw: субпиксельный антиалиасинг контура, физический свет и точная геометрия.</p>
-    </div>
+  <div class="portal">
+    <h3>Level Design</h3>
+    <ul>
+      <li><a href="#Overview">Basic Construction</a></li>
+      <li><a href="#Features">Displacements &amp; Seams</a></li>
+      <li><a href="#Features">Halton Lighting</a></li>
+      <li><a href="#Features">Physics Models (.PHY)</a></li>
+      <li><a href="#Features">Packfile (Lump 40)</a></li>
+    </ul>
+  </div>
 
-    <div class="gallery-grid">
-      <button class="gallery-item" type="button" data-src="assets/preview_outline.png" data-cap="Subpixel Anti-Aliased Outline: 12-точечный радиальный фильтр очерчивает силуэт пропов гладким жёлтым контуром без паутины рёбер">
-        <img src="assets/preview_outline.png" alt="Outline AA Preview" loading="lazy">
-        <div class="cap">
-          <b>Stencil Outline</b>
-          <span>Субпиксельное сглаживание контура</span>
-        </div>
-      </button>
-
-      <button class="gallery-item" type="button" data-src="assets/preview_lighting.png" data-cap="Halton 162-ray Lightbake: Физический расчет непрямого света, окклюзии и глубоких теней прямо во вьюпорте в реальном времени">
-        <img src="assets/preview_lighting.png" alt="Halton Lightbake Preview" loading="lazy">
-        <div class="cap">
-          <b>Halton Lightbake</b>
-          <span>162 луча / вертекс без VRAD</span>
-        </div>
-      </button>
-
-      <button class="gallery-item" type="button" data-src="assets/preview_skybox.png" data-cap="Seamless 2D Skybox: Математическое сведение всех 12 рёбер кубмапы неба без пирамидального замятия в зените">
-        <img src="assets/preview_skybox.png" alt="Skybox Projection Preview" loading="lazy">
-        <div class="cap">
-          <b>2D Skybox</b>
-          <span>Швы MSE=0.0 на всех картах</span>
-        </div>
-      </button>
-
-      <button class="gallery-item" type="button" data-src="assets/preview_collision.png" data-cap="Clean Physics Collision: Полное соответствие физическим координатам Source Havok/IVP и чистая фильтрация плоских рёбер">
-        <img src="assets/preview_collision.png" alt="Physics Collision Preview" loading="lazy">
-        <div class="cap">
-          <b>Physics .PHY</b>
-          <span>Точный физический каркас моделей</span>
-        </div>
-      </button>
-    </div>
-  </section>
-
-  <!-- Section 02: Core Technologies -->
-  <section class="section" id="features">
-    <div class="section-head">
-      <span class="section-num">02 / Technologies</span>
-      <h2>Архитектура ядра</h2>
-      <p>NoDraw решает проблемы, с которыми создатели карт Source сталкивались годами.</p>
-    </div>
-
-    <div class="feature-grid">
-      <div class="feature-card">
-        <span class="feature-num">01</span>
-        <h3>Halton 162-ray Lightbake</h3>
-        <p>
-          Встроенное превью освещения рассчитывает 162 квазислучайных луча Халтона (Halton 2, 3) на каждую вершину модели. Честный рассеянный свет неба, точный спад spotlight по Source SDK 2013 и физический Ambient Occlusion прямо в окне без ожидания компиляции.
-        </p>
-        <div class="tags">
-          <span class="tag">Lightbake</span>
-          <span class="tag">162 Halton</span>
-          <span class="tag">WebGPU</span>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-num">02</span>
-        <h3>Субпиксельный Stencil Outline</h3>
-        <p>
-          Трафаретная силуэтная обводка выбранных моделей вместо раздражающей паутины проволоки. 12-точечный радиальный фильтр с билинейной интерполяцией и параболической кривой альфы очерчивает модель мягким золотистым контуром. Текстуры и детали остаются на 100% читаемыми.
-        </p>
-        <div class="tags">
-          <span class="tag">Stencil Mask</span>
-          <span class="tag">Radial AA</span>
-          <span class="tag">Hammer++ Style</span>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-num">03</span>
-        <h3>Точный парсер коллизий .PHY</h3>
-        <p>
-          Реверс-инжиниринг структур Havok/IVP compact surface. Абсолютное согласование декартовых осей с моделями, отсечение внутреннего compound root меша и интеллектуальный фильтр копланарных рёбер <code>collision_hull_lines</code> для чистых геометрических контуров.
-        </p>
-        <div class="tags">
-          <span class="tag">Havok / IVP</span>
-          <span class="tag">Coplanar Filter</span>
-          <span class="tag">Physics Bounds</span>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-num">04</span>
-        <h3>Встроенный Pack (Замена VIDE)</h3>
-        <p>
-          Прямая инъекция ассетов в Lump 40 (pakfile) BSP-карты без необходимости в VIDE или внешних утилитах. Автоматический сбор Patch-материалов, текстур, звуков и моделей, плюс поддержка пользовательского списка Extra Files с сохранением в проект.
-        </p>
-        <div class="tags">
-          <span class="tag">BSP Lump 40</span>
-          <span class="tag">Zero VIDE</span>
-          <span class="tag">Auto-Resolve</span>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-num">05</span>
-        <h3>In-Editor Playtest (F6)</h3>
-        <p>
-          Мгновенный осмотр карты без долгого запуска игры. Нажатие F6 активирует физику игрока или noclip-полёт на V, ходьбу на WASD, прыжки и приседания. Оценивайте пропорции укрытий, высоту потолков и прострелы прямо на лету.
-        </p>
-        <div class="tags">
-          <span class="tag">Noclip Flight</span>
-          <span class="tag">Player Physics</span>
-          <span class="tag">Instant Test</span>
-        </div>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-num">06</span>
-        <h3>BPCEM Кубмапы для Garry's Mod</h3>
-        <p>
-          Автоматический расчет AABB-границ комнат для Box-Projected Cubemaps. Отражения на полированных поверхностях в игре точно повторяют геометрию стен и окон, устраняя артефакт бесконечного параллакса.
-        </p>
-        <div class="tags">
-          <span class="tag">BPCEM</span>
-          <span class="tag">GMod Engine</span>
-          <span class="tag">Reflections</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 03: Compare -->
-  <section class="section" id="compare">
-    <div class="section-head">
-      <span class="section-num">03 / Benchmark</span>
-      <h2>Сравнение характеристик</h2>
-      <p>Почему переход на современную кодовую базу на Rust кардинально меняет опыт левел-дизайна.</p>
-    </div>
-
-    <div class="compare-box">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Параметр</th>
-            <th>Hammer++</th>
-            <th>NoDraw</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Архитектура ядра</strong></td>
-            <td class="badge-hplus">MFC / C++ 2003 (32/64-bit)</td>
-            <td class="badge-nodraw">⚡ Rust + WebGPU (нативное ускорение)</td>
-          </tr>
-          <tr>
-            <td><strong>Обводка силуэта пропов</strong></td>
-            <td class="badge-hplus">1-пиксельная бинарная лестница</td>
-            <td class="badge-nodraw">✨ 12-точечный субпиксельный Anti-Aliasing</td>
-          </tr>
-          <tr>
-            <td><strong>Каркас коллизий .PHY</strong></td>
-            <td class="badge-hplus">Тянет паутину диагоналей через грани</td>
-            <td class="badge-nodraw">📐 Фильтрация копланарных рёбер (чистый бокс)</td>
-          </tr>
-          <tr>
-            <td><strong>Превью освещения</strong></td>
-            <td class="badge-hplus">Требует компиляции или медленный bake</td>
-            <td class="badge-nodraw">💡 162-лучевой Halton превью в реальном времени</td>
-          </tr>
-          <tr>
-            <td><strong>Упаковка контента в BSP</strong></td>
-            <td class="badge-hplus">Требуется сторонний VIDE / bspzip</td>
-            <td class="badge-nodraw">📦 Встроенный Lump 40 пакер в один клик</td>
-          </tr>
-          <tr>
-            <td><strong>Режим полёта и осмотра</strong></td>
-            <td class="badge-hplus">Только запуск игры через F9</td>
-            <td class="badge-nodraw">🎮 F6 In-Editor Playtest с noclip и физикой</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Section 04: Download & Testers -->
-  <section class="section" id="download">
-    <div class="section-head">
-      <span class="section-num">04 / Downloads</span>
-      <h2>Закрытый билд для тестеров</h2>
-      <p>Портативная сборка NoDraw для тестирования на ваших проектах и картах.</p>
-    </div>
-
-    <div class="tester-box">
-      <div class="tester-content">
-        <h3>NoDraw Closed Beta</h3>
-        <p>
-          Сборка содержит автономный бинарник <code>NoDraw.exe</code>, полный комплект иконок и плагинов.
-          Редактор не требует установки: распакуйте архив в удобную папку на диске и запустите.
-          NoDraw автоматически обнаружит установленный Steam, библиотеки Garry's Mod и подключённый контент.
-        </p>
-        <div class="tester-actions">
-          <a href="downloads/nodraw-beta-tester.zip" class="btn-download" download>
-            <svg class="ico" fill="currentColor" viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm9-4v8H3v-8H1v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-8h-2z"/></svg>
-            Скачать NoDraw-2026-11-03.zip (19.7 MB)
-          </a>
-        </div>
-        <div class="meta-pills">
-          <span class="meta-pill">Версия: 0.1.0 Beta</span>
-          <span class="meta-pill">ОС: Windows 10 / 11 (64-bit)</span>
-          <span class="meta-pill">Рендер: Vulkan / DX12 (WebGPU)</span>
-          <span class="meta-pill">Установка: Не требуется (Portable)</span>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- Lightbox Modal (Synapse Style) -->
-<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
-  <img id="lb-img" alt="">
-  <button class="lb-btn lb-close" id="lb-close" aria-label="Закрыть">✕</button>
-  <button class="lb-btn lb-prev" id="lb-prev" aria-label="Предыдущее">‹</button>
-  <button class="lb-btn lb-next" id="lb-next" aria-label="Следующее">›</button>
-  <div class="lb-caption" id="lb-caption"></div>
+  <div class="portal">
+    <h3>Tooling &amp; SDK</h3>
+    <ul>
+      <li><a href="downloads/nodraw-beta-tester.zip" download><b>Download Beta (.zip)</b></a></li>
+      <li><a href="https://github.com/env-snake/no-draw" target="_blank">GitHub Repository</a></li>
+      <li><a href="https://t.me/env_snk" target="_blank">Telegram: @env_snk</a></li>
+    </ul>
+  </div>
 </div>
 
-<footer>
-  <span>NoDraw Development Team · Next-Gen Source Engine Tooling</span>
-  <button class="foot-copy" type="button" onclick="navigator.clipboard.writeText('env_snake'); alert('Discord скопирован: env_snake')">
-    Discord: env_snake
-  </button>
-</footer>
+<!-- Header (#mw-head) -->
+<div id="mw-head">
+  <div id="p-personal">
+    <ul>
+      <li><span style="color:var(--vdc-text-muted);">Build: 2026-11-03</span></li>
+      <li><a href="javascript:void(0)" onclick="toggleTheme()" id="theme-btn">🌓 Toggle Dark/Light</a></li>
+      <li><a href="#Download"><b>Tester Access</b></a></li>
+    </ul>
+  </div>
+
+  <div id="left-navigation">
+    <ul class="vector-tabs">
+      <li class="selected"><a href="#top">Page</a></li>
+      <li><a href="https://github.com/env-snake/no-draw" target="_blank">Discussion</a></li>
+    </ul>
+  </div>
+
+  <div id="right-navigation">
+    <ul class="vector-tabs">
+      <li class="selected"><a href="#top">Read</a></li>
+      <li><a href="https://github.com/env-snake/no-draw" target="_blank">View source</a></li>
+      <li><a href="#Comparison">History</a></li>
+      <li class="cta-tab"><a href="downloads/nodraw-beta-tester.zip" download>⚡ Download (19.7 MB)</a></li>
+    </ul>
+
+    <div id="p-search">
+      <div class="search-box">
+        <input type="text" placeholder="Search NoDraw VDC..." id="searchInput">
+        <button type="button">Go</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Body Content (#content) -->
+<div id="content" class="mw-body">
+  <div class="lang-bar">
+    <span>Language:</span>
+    <span class="current-lang">English (en)</span>
+    <span>•</span>
+    <span><a href="#" style="color:#f5c518;">Русский (ru)</a></span>
+  </div>
+
+  <!-- Page Heading -->
+  <h1 id="firstHeading" class="firstHeading">NoDraw</h1>
+  <div id="siteSub">From Valve Developer Community</div>
+
+  <!-- Infobox -->
+  <table class="infobox">
+    <tr>
+      <th colspan="2" class="infobox-header">NoDraw Level Editor</th>
+    </tr>
+    <tr>
+      <td colspan="2" class="infobox-subheader">Next-generation level editor for Source Engine &amp; Garry's Mod</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="infobox-image">
+        <img src="assets/preview_lighting.png" alt="NoDraw Viewport">
+      </td>
+    </tr>
+    <tr>
+      <th>Developer</th>
+      <td><a href="https://github.com/env-snake" target="_blank">env_snake</a></td>
+    </tr>
+    <tr>
+      <th>Initial Release</th>
+      <td>November 2026</td>
+    </tr>
+    <tr>
+      <th>Current Version</th>
+      <td><code>0.1.0-beta</code> (2026-11-03)</td>
+    </tr>
+    <tr>
+      <th>Architecture</th>
+      <td>Rust + WebGPU (64-bit)</td>
+    </tr>
+    <tr>
+      <th>Target Engines</th>
+      <td>Source Engine (Source 1), Garry's Mod</td>
+    </tr>
+    <tr>
+      <th>Supported Maps</th>
+      <td><code>.vmf</code>, <code>.bsp</code>, <code>.vmx</code></td>
+    </tr>
+    <tr>
+      <th>License</th>
+      <td>Closed Beta (Tester Distribution)</td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align:center; padding:10px;">
+        <a href="downloads/nodraw-beta-tester.zip" class="btn-download-box" download>
+          💾 Download Beta .ZIP (19.7 MB)
+        </a>
+        <small style="color:var(--vdc-text-muted);">Portable (No installation required)</small>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Article Introduction -->
+  <p>
+    <b>NoDraw</b> is a modern, standalone 64-bit level editor for the <a href="https://developer.valvesoftware.com/wiki/Source" target="_blank">Source Engine</a> and <a href="https://developer.valvesoftware.com/wiki/Garry%27s_Mod" target="_blank">Garry's Mod</a>, engineered in Rust on top of <a href="https://wgpu.rs/" target="_blank">wgpu</a>. Designed as the direct successor to <a href="https://developer.valvesoftware.com/wiki/Hammer%2B%2B" target="_blank">Hammer++</a> and Valve's legacy Hammer Editor, NoDraw removes decades of MFC legacy baggage while delivering true real-time lighting calculations, subpixel anti-aliasing on object selection, seamless displacement sewing, and integrated BSP lump packing.
+  </p>
+
+  <div class="vdc-box vdc-note">
+    <span>💡</span>
+    <div><b>Note:</b> NoDraw reads directly from your existing Steam library and <code>mount.cfg</code> configurations without requiring any game modification or DLL replacement.</div>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc" id="toc">
+    <div class="toctitle">
+      <h2>Contents</h2>
+      <span class="toctoggle" onclick="toggleToc()">[hide]</span>
+    </div>
+    <ul id="toc-list">
+      <li><span class="tocnumber">1</span> <a href="#Overview">Overview &amp; Philosophy</a></li>
+      <li><span class="tocnumber">2</span> <a href="#Features">Core Features</a>
+        <ul>
+          <li><span class="tocnumber">2.1</span> <a href="#Halton_Lighting">Physically Accurate Halton Lighting</a></li>
+          <li><span class="tocnumber">2.2</span> <a href="#Stencil_Outline">Subpixel Stencil Silhouette Outlines</a></li>
+          <li><span class="tocnumber">2.3</span> <a href="#PHY_Collision">Precise .PHY Collision Mesh Pipeline</a></li>
+          <li><span class="tocnumber">2.4</span> <a href="#Playtest_F6">In-Editor Playtest &amp; Noclip Mode (F6)</a></li>
+          <li><span class="tocnumber">2.5</span> <a href="#Packfile_Lump40">Integrated Lump 40 Packfile (VIDE Replacement)</a></li>
+          <li><span class="tocnumber">2.6</span> <a href="#BPCEM_Cubemaps">Parallax-Corrected Cubemaps (BPCEM)</a></li>
+        </ul>
+      </li>
+      <li><span class="tocnumber">3</span> <a href="#Comparison">Comparison with Hammer++</a></li>
+      <li><span class="tocnumber">4</span> <a href="#Hotkeys">Keyboard Shortcuts</a></li>
+      <li><span class="tocnumber">5</span> <a href="#Gallery">Render Previews</a></li>
+      <li><span class="tocnumber">6</span> <a href="#Download">Tester Distribution &amp; Setup</a></li>
+      <li><span class="tocnumber">7</span> <a href="#See_Also">See Also</a></li>
+    </ul>
+  </div>
+
+  <!-- Section 1 -->
+  <h2 id="Overview"><span class="mw-headline">Overview &amp; Philosophy</span></h2>
+  <p>
+    The classic Valve Hammer Editor was built around Windows MFC in the late 1990s. While Hammer++ brought numerous stability and viewport improvements, it remains tethered to 32-bit/early 64-bit C++ architectures with fixed-function OpenGL assumptions.
+  </p>
+  <p>
+    <b>NoDraw</b> rebuilds the map editing workflow from fundamental principles:
+  </p>
+  <ul>
+    <li><b>Modern Graphics Backend:</b> Utilizing Vulkan and DirectX 12 through WebGPU. Zero crashes on large meshes or complex HDR scenes.</li>
+    <li><b>Instantaneous Feedback:</b> Edit lighting, materials, and complex brushwork with real-time feedback rather than running external compile tools.</li>
+    <li><b>Safe Memory Architecture:</b> Built with 100% memory-safe Rust, preventing pointer corruption crashes during vertex manipulation.</li>
+  </ul>
+
+  <!-- Section 2 -->
+  <h2 id="Features"><span class="mw-headline">Core Features</span></h2>
+
+  <h3 id="Halton_Lighting">Physically Accurate Halton Lighting</h3>
+  <p>
+    Unlike conventional editors that only compute simple dot-product vertex normals, NoDraw integrates a dedicated <b>Halton 162-ray Lightbake</b> pipeline:
+  </p>
+  <ul>
+    <li>Samples 162 quasi-random Halton (2, 3) rays per prop vertex to compute indirect bounced light and sky ambient occlusion.</li>
+    <li>Direct spotlight attenuation adheres strictly to the Source SDK 2013 <code>LightDesc_t::ComputeLightAtPoints</code> quadratic inverse-square model with smooth cosine transitions.</li>
+    <li>Produces deep, authentic LDR/HDR shadows matching VRAD without waiting for full BSP compilation.</li>
+  </ul>
+
+  <h3 id="Stencil_Outline">Subpixel Stencil Silhouette Outlines</h3>
+  <p>
+    Selected static and dynamic props are highlighted through a two-pass <b>Stencil Silhouette Outline</b> shader:
+  </p>
+  <dl>
+    <dt>Pass 1 (Mask Generation)</dt>
+    <dd>Selected models render into a dedicated R8Unorm silhouette mask with alpha-testing on sprites (e.g. <code>light</code>, <code>env_sprite</code>).</dd>
+    <dt>Pass 2 (Radial Screen-Space Filter)</dt>
+    <dd>A 12-sample radial bilinear filter with a parabolic falloff curve $\alpha = 4N(1-N)$ creates a smooth, anti-aliased golden-yellow contour (<code>#f5c518</code>) around props without cluttering interior textures with wireframe edges.</dd>
+  </dl>
+
+  <h3 id="PHY_Collision">Precise .PHY Collision Mesh Pipeline</h3>
+  <p>
+    NoDraw features a reverse-engineered parser for Havok/IVP compact surface physics files (<code>.phy</code>):
+  </p>
+  <div class="vdc-box vdc-tip">
+    <span>📐</span>
+    <div><b>Coordinate Accuracy:</b> Implements exact IVP-to-Source spatial transformation $[z \cdot M, -x \cdot M, -y \cdot M]$, completely eliminating the 90-degree rotational drift observed in legacy parsers.</div>
+  </div>
+  <ul>
+    <li>Filters out internal coplanar diagonal edges (where adjacent triangle normals have dot product $> 0.985$), displaying clean, solid convex hulls.</li>
+    <li>Multi-convex support: correctly maps compound hulls across trees, bridges, doors, and complex rock models.</li>
+  </ul>
+
+  <h3 id="Playtest_F6">In-Editor Playtest &amp; Noclip Mode (F6)</h3>
+  <p>
+    Pressing <span class="keyboard-key">F6</span> launches an instant playtest mode directly inside the 3D viewport without compiling:
+  </p>
+  <ul>
+    <li>Standard player movement: <span class="keyboard-key">W</span> <span class="keyboard-key">A</span> <span class="keyboard-key">S</span> <span class="keyboard-key">D</span> navigation, <span class="keyboard-key">Space</span> jump, and <span class="keyboard-key">Ctrl</span> crouch.</li>
+    <li>Noclip toggle via <span class="keyboard-key">V</span> or <span class="keyboard-key">N</span> with flight speed scaling up to 800 units/second via <span class="keyboard-key">Shift</span>.</li>
+  </ul>
+
+  <h3 id="Packfile_Lump40">Integrated Lump 40 Packfile (VIDE Replacement)</h3>
+  <p>
+    Solves the missing content issue by analyzing all map references and writing them straight into the compiled BSP:
+  </p>
+  <ul>
+    <li>Resolves Patch materials (<code>include</code> directives), base textures, normal maps, cubemaps, sounds, and particle PCF files.</li>
+    <li>Support for custom user-defined extra files stored in <code>&lt;map&gt;.nodraw_pack.json</code>.</li>
+  </ul>
+
+  <h3 id="BPCEM_Cubemaps">Parallax-Corrected Cubemaps (BPCEM)</h3>
+  <p>
+    Computes room AABB boundaries by casting ray traces from each <code>env_cubemap</code> to surrounding walls. Injects Box-Projected Cubemap (BPCEM) matrices into the map, allowing polished floors, marble tiles, and glass windows in Garry's Mod to reflect room geometry with accurate perspective.
+  </p>
+
+  <!-- Section 3 -->
+  <h2 id="Comparison"><span class="mw-headline">Comparison with Hammer++</span></h2>
+  <table class="wikitable">
+    <thead>
+      <tr>
+        <th style="width: 28%;">Feature / Capability</th>
+        <th style="width: 36%;">Hammer++</th>
+        <th style="width: 36%;">NoDraw</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Core Engine Architecture</b></td>
+        <td>MFC / C++ 2003 (Legacy Windows API)</td>
+        <td><b>Rust + WebGPU</b> (Cross-platform Vulkan / DX12)</td>
+      </tr>
+      <tr>
+        <td><b>Prop Silhouette Selection</b></td>
+        <td>1-pixel aliased binary mask</td>
+        <td><b>12-tap Subpixel Anti-Aliased</b> Stencil Outline</td>
+      </tr>
+      <tr>
+        <td><b>Physics (.PHY) Display</b></td>
+        <td>Draws dense diagonal wireframe webs</td>
+        <td><b>Coplanar edge filter</b> (clean geometric hulls)</td>
+      </tr>
+      <tr>
+        <td><b>Viewport Lighting</b></td>
+        <td>Fast OpenGL approximation / VRAD wait</td>
+        <td><b>162-ray Halton Lightbake</b> in real-time</td>
+      </tr>
+      <tr>
+        <td><b>Packfile Utility</b></td>
+        <td>External programs required (VIDE / Pakrat)</td>
+        <td><b>Built-in Lump 40 injection</b> with 1 click</td>
+      </tr>
+      <tr>
+        <td><b>Instant Walkthrough</b></td>
+        <td>Compile required via F9</td>
+        <td><b>Instant F6 Playtest</b> with noclip and player gravity</td>
+      </tr>
+      <tr>
+        <td><b>2D Skybox Seams</b></td>
+        <td>Occasional zenith pinching on custom VTFs</td>
+        <td><b>Mathematical continuity (MSE = 0.0)</b> across all 12 edges</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 4 -->
+  <h2 id="Hotkeys"><span class="mw-headline">Keyboard Shortcuts</span></h2>
+  <dl>
+    <dt><span class="keyboard-key">F6</span></dt>
+    <dd>Toggle in-editor real-time Playtest (WASD movement, gravity, collision).</dd>
+    <dt><span class="keyboard-key">V</span> / <span class="keyboard-key">N</span></dt>
+    <dd>Toggle Noclip flight mode during Playtest.</dd>
+    <dt><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">Alt</span> + <span class="keyboard-key">G</span></dt>
+    <dd>Go to Coordinates: supports raw coordinates or console <code>setpos / setang</code> strings.</dd>
+    <dt><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">G</span> / <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">U</span></dt>
+    <dd>Group and ungroup selected brushes and displacements.</dd>
+    <dt><span class="keyboard-key">Alt</span> + <span class="keyboard-key">S</span></dt>
+    <dd>In-context 3D Skybox editing: isolates the skybox chamber with 1:1 scale manipulation.</dd>
+    <dt><span class="keyboard-key">Esc</span></dt>
+    <dd>Immediate Stop / Cancellation of ongoing map compilation jobs (kills process tree via taskkill).</dd>
+  </dl>
+
+  <!-- Section 5 -->
+  <h2 id="Gallery"><span class="mw-headline">Render Previews</span></h2>
+  <p>Click on any preview image to examine full-resolution viewport captures:</p>
+
+  <div class="thumb-grid">
+    <div class="thumb" onclick="openModal('assets/preview_outline.png')">
+      <img src="assets/preview_outline.png" alt="Stencil Silhouette Outline">
+      <div class="thumbcaption"><b>Figure 1:</b> 12-tap Subpixel Anti-Aliased Outline on Combine props in <code>ota_spawn.vmf</code>.</div>
+    </div>
+
+    <div class="thumb" onclick="openModal('assets/preview_lighting.png')">
+      <img src="assets/preview_lighting.png" alt="Halton 162-ray Lightbake">
+      <div class="thumbcaption"><b>Figure 2:</b> Deep physical Halton lighting preview with accurate ambient occlusion and spotlight cones.</div>
+    </div>
+
+    <div class="thumb" onclick="openModal('assets/preview_skybox.png')">
+      <img src="assets/preview_skybox.png" alt="Seamless Skybox">
+      <div class="thumbcaption"><b>Figure 3:</b> Seamless 2D skybox projection without corner pinching or pyramid zenith seams.</div>
+    </div>
+
+    <div class="thumb" onclick="openModal('assets/preview_collision.png')">
+      <img src="assets/preview_collision.png" alt="PHY Physics Mesh">
+      <div class="thumbcaption"><b>Figure 4:</b> Clean convex physics hull rendering with coplanar edge elimination on spooky tree assets.</div>
+    </div>
+  </div>
+
+  <!-- Section 6 -->
+  <h2 id="Download"><span class="mw-headline">Tester Distribution &amp; Setup</span></h2>
+  <p>
+    NoDraw is currently distributed as a portable standalone archive for authorized testers and community developers.
+  </p>
+
+  <table class="wikitable" style="max-width: 650px;">
+    <tr>
+      <th colspan="2">Download Package Specifications</th>
+    </tr>
+    <tr>
+      <td><b>File Name</b></td>
+      <td><code>nodraw-beta-tester.zip</code></td>
+    </tr>
+    <tr>
+      <td><b>Archive Size</b></td>
+      <td>19.66 MB (Compressed ZIP)</td>
+    </tr>
+    <tr>
+      <td><b>Build Timestamp</b></td>
+      <td>2026-11-03</td>
+    </tr>
+    <tr>
+      <td><b>Included Contents</b></td>
+      <td><code>NoDraw.exe</code> (Release x64), <code>icons/</code> (1154 items), <code>plugins/</code>, <code>README.txt</code></td>
+    </tr>
+    <tr>
+      <td><b>Installation Link</b></td>
+      <td><a href="downloads/nodraw-beta-tester.zip" class="btn-download-box" style="display:inline-block; padding:4px 16px; margin:0;" download>Download Build (.ZIP)</a></td>
+    </tr>
+  </table>
+
+  <h3>Quickstart Instructions</h3>
+  <ol>
+    <li>Extract <code>nodraw-beta-tester.zip</code> into any folder of your choice (e.g. <code>C:\MappingTools\NoDraw</code>).</li>
+    <li>Ensure the <code>icons/</code> folder is located next to <code>NoDraw.exe</code>.</li>
+    <li>Launch <b><code>NoDraw.exe</code></b>. No system registry changes or installer required.</li>
+    <li>NoDraw will automatically search Steam registry keys and <code>libraryfolders.vdf</code> to locate your Garry's Mod content. If your game resides in a custom directory, select it via <b>Settings → Game Folder</b>.</li>
+    <li>Open any map: <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span> or drag-and-drop a <code>.vmf</code> file onto the editor window.</li>
+  </ol>
+
+  <!-- Section 7 -->
+  <h2 id="See_Also"><span class="mw-headline">See Also</span></h2>
+  <ul>
+    <li><a href="https://developer.valvesoftware.com/wiki/Hammer%2B%2B" target="_blank">Hammer++</a></li>
+    <li><a href="https://developer.valvesoftware.com/wiki/Level_Design_Overview" target="_blank">Level Design Overview</a></li>
+    <li><a href="https://developer.valvesoftware.com/wiki/Category:Level_Design" target="_blank">Category: Level Design</a></li>
+    <li><a href="https://developer.valvesoftware.com/wiki/Logic_relay" target="_blank">logic_relay Entity Reference</a></li>
+  </ul>
+
+  <!-- Category links -->
+  <div id="catlinks" class="catlinks">
+    <div id="mw-normal-catlinks">
+      <a href="#">Categories</a>: 
+      <ul>
+        <li><a href="#">Level Design</a></li>
+        <li><a href="#">Hammer Editors</a></li>
+        <li><a href="#">Source SDK Tools</a></li>
+        <li><a href="#">Garry's Mod Mapping</a></li>
+        <li><a href="#">Rust Applications</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="footer" role="contentinfo">
+  <ul>
+    <li>This documentation was built for NoDraw v0.1.0-beta. Content styled according to Valve Developer Community specifications.</li>
+    <li>Contact developer via Discord: <code>env_snake</code> · Telegram: <a href="https://t.me/env_snk" target="_blank">@env_snk</a> · <a href="https://github.com/env-snake/no-draw" target="_blank">GitHub</a></li>
+  </ul>
+</div>
+
+<!-- Image Modal -->
+<div class="modal-lb" id="modalLb" onclick="closeModal()">
+  <img id="modalImg" src="" alt="Fullscreen Preview">
+</div>
 
 <script>
-  // Topbar scroll state
-  const topbar = document.getElementById('topbar');
-  window.addEventListener('scroll', () => {
-    topbar.classList.toggle('solid', window.scrollY > 40);
-  }, { passive: true });
-
-  // Rail scroll spy
-  const sections = Array.from(document.querySelectorAll('section[id], header[id]'));
-  const railLinks = Array.from(document.querySelectorAll('.rail a'));
-  const railFill = document.getElementById('rail-fill');
-
-  function updateRail() {
-    const scroll = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if (railFill && maxScroll > 0) {
-      railFill.style.height = `${Math.min(100, Math.max(0, (scroll / maxScroll) * 100))}%`;
+  function toggleToc() {
+    const list = document.getElementById('toc-list');
+    const toggle = document.querySelector('.toctoggle');
+    if (list.style.display === 'none') {
+      list.style.display = 'block';
+      toggle.textContent = '[hide]';
+    } else {
+      list.style.display = 'none';
+      toggle.textContent = '[show]';
     }
-
-    let activeId = 'top';
-    for (const sec of sections) {
-      const top = sec.offsetTop - 140;
-      if (scroll >= top) {
-        activeId = sec.id;
-      }
-    }
-    railLinks.forEach(link => {
-      const href = link.getAttribute('href').substring(1);
-      link.classList.toggle('active', href === activeId);
-    });
   }
 
-  window.addEventListener('scroll', updateRail, { passive: true });
-  updateRail();
-
-  // Lightbox implementation
-  const lb = document.getElementById('lb');
-  const lbImg = document.getElementById('lb-img');
-  const lbCap = document.getElementById('lb-caption');
-  const galleryItems = Array.from(document.querySelectorAll('.gallery-item'));
-  let currentIdx = 0;
-
-  function openLb(index) {
-    currentIdx = index;
-    const item = galleryItems[index];
-    lbImg.src = item.dataset.src;
-    lbCap.textContent = item.dataset.cap;
-    lb.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+    localStorage.setItem('vdc-theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
   }
 
-  function closeLb() {
-    lb.classList.remove('open');
-    document.body.style.overflow = '';
+  if (localStorage.getItem('vdc-theme') === 'dark') {
+    document.body.classList.add('dark-theme');
   }
 
-  function nextLb() {
-    currentIdx = (currentIdx + 1) % galleryItems.length;
-    openLb(currentIdx);
+  function openModal(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('modalLb').classList.add('active');
   }
 
-  function prevLb() {
-    currentIdx = (currentIdx - 1 + galleryItems.length) % galleryItems.length;
-    openLb(currentIdx);
+  function closeModal() {
+    document.getElementById('modalLb').classList.remove('active');
   }
-
-  galleryItems.forEach((btn, i) => {
-    btn.addEventListener('click', () => openLb(i));
-  });
-
-  document.getElementById('lb-close').addEventListener('click', closeLb);
-  document.getElementById('lb-next').addEventListener('click', nextLb);
-  document.getElementById('lb-prev').addEventListener('click', prevLb);
-
-  lb.addEventListener('click', (e) => {
-    if (e.target === lb) closeLb();
-  });
 
   window.addEventListener('keydown', (e) => {
-    if (!lb.classList.contains('open')) return;
-    if (e.key === 'Escape') closeLb();
-    if (e.key === 'ArrowRight') nextLb();
-    if (e.key === 'ArrowLeft') prevLb();
+    if (e.key === 'Escape') closeModal();
   });
 </script>
 
