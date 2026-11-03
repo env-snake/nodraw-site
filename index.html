@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="ru" dir="ltr">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NoDraw — Документация редактора карт</title>
+<title>NoDraw — Level Editor Documentation</title>
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-<meta name="description" content="NoDraw — полноценный современный редактор карт для Source Engine и Garry's Mod на Rust и WebGPU.">
+<meta name="description" content="NoDraw — Next-gen Level Editor for Source Engine and Garry's Mod built in Rust with WebGPU.">
 
 <style>
   /* ==========================================================================
-     NoDraw Dark Theme (Neutral Charcoal & Gold Palette matching NoDraw UI 1:1)
-     No purple, no blue tints. Pure neutral dark grays with NoDraw gold accents.
+     NoDraw Dark Theme (Strict Neutral Charcoal & Gold Palette)
+     Neutral dark grays (zero blue/purple tint) matching NoDraw UI 1:1
      ========================================================================== */
   :root {
     --nd-bg-page: #121214;
@@ -18,11 +18,11 @@
     --nd-bg-sidebar: #18181b;
     --nd-bg-content: #1e1e22;
     --nd-bg-card: #232328;
-    --nd-bg-hover: #2b2b32;
+    --nd-bg-hover: #2a2a30;
     
-    --nd-border: #2f2f35;
-    --nd-border-subtle: #26262c;
-    --nd-border-heading: #3a3a44;
+    --nd-border: #2e2e34;
+    --nd-border-subtle: #24242a;
+    --nd-border-heading: #383842;
     
     --nd-text-bright: #ffffff;
     --nd-text: #e4e4e7;
@@ -31,8 +31,8 @@
     
     --nd-gold: #f5c518;
     --nd-gold-hover: #ffdb4d;
-    --nd-gold-soft: rgba(245, 197, 24, 0.10);
-    --nd-gold-border: rgba(245, 197, 24, 0.30);
+    --nd-gold-soft: rgba(245, 197, 24, 0.12);
+    --nd-gold-border: rgba(245, 197, 24, 0.35);
     
     --nd-code-bg: #141416;
     --nd-code-border: #2c2c32;
@@ -47,10 +47,17 @@
     font-size: 13.5px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   a { color: var(--nd-gold); text-decoration: none; transition: color 0.15s; }
   a:hover { color: var(--nd-gold-hover); text-decoration: underline; }
+
+  /* Custom Slim Scrollbars */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--nd-bg-page); }
+  ::-webkit-scrollbar-thumb { background: #32323a; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--nd-gold); }
 
   /* Top Bar */
   #top-bar {
@@ -64,32 +71,32 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
+    padding: 0 20px;
     z-index: 100;
   }
 
   .brand-area {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
   }
   .brand-logo {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 4px;
     border: 1px solid var(--nd-border);
   }
   .brand-title {
     font-size: 16px;
     font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.02em;
+    color: #ffffff;
+    letter-spacing: -0.01em;
     line-height: 1.1;
   }
   .brand-title span { color: var(--nd-gold); }
   .brand-sub {
-    font-size: 10px;
+    font-size: 9.5px;
     color: var(--nd-text-dim);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -98,19 +105,29 @@
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
+  }
+  .lang-tag {
+    font-size: 11px;
+    font-family: Consolas, monospace;
+    font-weight: 700;
+    color: var(--nd-gold);
+    background: var(--nd-gold-soft);
+    border: 1px solid var(--nd-gold-border);
+    padding: 2px 8px;
+    border-radius: 3px;
   }
   .btn-download-head {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     background: var(--nd-gold);
     color: #0b0d11 !important;
     font-weight: 700;
-    font-size: 12.5px;
+    font-size: 12px;
     padding: 6px 14px;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     transition: filter 0.15s, transform 0.15s;
   }
   .btn-download-head:hover {
@@ -128,26 +145,27 @@
     width: 250px;
     background: var(--nd-bg-sidebar);
     border-right: 1px solid var(--nd-border);
-    padding: 16px 14px 40px 14px;
+    padding: 16px 12px 40px 12px;
     overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .nav-group {
-    margin-bottom: 18px;
-    padding-bottom: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--nd-border-subtle);
   }
   .nav-group:last-child {
     border-bottom: none;
   }
   .nav-header {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--nd-text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    padding-left: 6px;
+    letter-spacing: 0.09em;
+    margin-bottom: 6px;
+    padding: 2px 6px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -158,7 +176,7 @@
     padding: 0;
   }
   .nav-list li {
-    margin: 2px 0;
+    margin: 1px 0;
   }
   .nav-list a {
     display: flex;
@@ -168,6 +186,9 @@
     font-size: 12.5px;
     padding: 5px 8px;
     border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: background 0.15s, color 0.15s;
   }
   .nav-list a:hover {
@@ -182,64 +203,64 @@
   }
 
   .icon-tool {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     object-fit: contain;
     flex-shrink: 0;
   }
 
-  /* Main Content Layout */
+  /* Main Content Area */
   #main-content {
     margin-left: 250px;
     margin-top: 50px;
     background: var(--nd-bg-content);
-    padding: 28px 44px 80px 44px;
+    padding: 26px 40px 80px 40px;
     min-height: calc(100vh - 50px);
   }
 
   .doc-crumb {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--nd-text-dim);
     margin-bottom: 12px;
   }
 
   h1.page-title {
-    font-size: 28px;
+    font-size: 27px;
     font-weight: 700;
     color: var(--nd-text-bright);
     margin: 0 0 4px 0;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--nd-border-heading);
     letter-spacing: -0.01em;
   }
   .page-subtitle {
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--nd-text-dim);
-    margin-bottom: 22px;
+    margin-bottom: 20px;
   }
 
   h2 {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--nd-text-bright);
     border-bottom: 1px solid var(--nd-border-heading);
-    margin: 36px 0 14px 0;
-    padding-bottom: 6px;
+    margin: 34px 0 14px 0;
+    padding-bottom: 5px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
   h2 .icon-h2 {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
   }
 
   h3 {
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 600;
     color: var(--nd-gold);
-    margin: 22px 0 8px 0;
+    margin: 20px 0 8px 0;
     display: flex;
     align-items: center;
     gap: 7px;
@@ -249,15 +270,15 @@
   ul, ol { margin: 0 0 14px 22px; color: var(--nd-text); }
   li { margin-bottom: 5px; }
 
-  /* Infobox (Properties summary card on right) */
+  /* Infobox */
   .infobox-card {
     float: right;
     clear: right;
-    width: 320px;
+    width: 300px;
     margin: 0 0 18px 24px;
     background: var(--nd-bg-card);
     border: 1px solid var(--nd-border);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.35);
   }
@@ -268,36 +289,36 @@
     text-align: center;
     font-weight: 700;
     font-size: 14px;
-    color: #fff;
+    color: #ffffff;
   }
   .infobox-sub {
     background: rgba(0,0,0,0.25);
     padding: 4px 10px;
     text-align: center;
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--nd-text-dim);
     border-bottom: 1px solid var(--nd-border);
   }
-  .infobox-preview {
-    background: #0d0d0f;
-    padding: 8px;
+  .infobox-logo-wrap {
+    background: #141416;
+    padding: 22px 14px;
     text-align: center;
     border-bottom: 1px solid var(--nd-border);
   }
-  .infobox-preview img {
-    width: 100%;
-    display: block;
-    cursor: zoom-in;
-    border: 1px solid var(--nd-border);
-    border-radius: 2px;
+  .infobox-logo-wrap img {
+    width: 96px;
+    height: 96px;
+    display: inline-block;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
   }
   .infobox-grid {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 11.5px;
   }
   .infobox-grid th, .infobox-grid td {
-    padding: 7px 10px;
+    padding: 6px 10px;
     border-bottom: 1px solid var(--nd-border-subtle);
   }
   .infobox-grid th {
@@ -331,7 +352,7 @@
     justify-content: space-between;
     align-items: center;
     font-weight: 700;
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--nd-text-bright);
     margin-bottom: 8px;
     padding-bottom: 4px;
@@ -341,23 +362,23 @@
     font-size: 11px;
     color: var(--nd-gold);
     cursor: pointer;
-    font-weight: 500;
+    font-weight: normal;
   }
-  .toc-list { list-style: none; margin: 0; padding: 0; font-size: 12.5px; }
+  .toc-list { list-style: none; margin: 0; padding: 0; font-size: 12px; }
   .toc-list ul { list-style: none; padding-left: 16px; margin: 2px 0; }
   .toc-list li { margin: 3px 0; }
-  .toc-num { color: var(--nd-gold); margin-right: 6px; font-family: Consolas, monospace; font-size: 11px; font-weight: 600; }
+  .toc-num { color: var(--nd-gold); margin-right: 6px; font-family: Consolas, monospace; font-size: 11px; }
 
-  /* VDC Style Callout Boxes */
+  /* Callout Boxes */
   .callout-box {
-    padding: 12px 16px;
-    margin: 16px 0;
-    border-radius: 3px;
-    font-size: 13px;
+    padding: 10px 14px;
+    margin: 14px 0;
+    border-radius: 2px;
+    font-size: 12.5px;
     line-height: 1.5;
   }
   .callout-important {
-    border-left: 4px solid var(--nd-gold);
+    border-left: 3px solid var(--nd-gold);
     background: rgba(245, 197, 24, 0.08);
     border-top: 1px solid var(--nd-border);
     border-right: 1px solid var(--nd-border);
@@ -366,7 +387,7 @@
   }
   .callout-important b { color: var(--nd-gold); }
   .callout-note {
-    border-left: 4px solid #71717a;
+    border-left: 3px solid #71717a;
     background: var(--nd-bg-card);
     border-top: 1px solid var(--nd-border);
     border-right: 1px solid var(--nd-border);
@@ -381,20 +402,20 @@
     border-collapse: collapse;
     background: var(--nd-bg-card);
     border: 1px solid var(--nd-border);
-    margin: 16px 0;
-    font-size: 12.5px;
+    margin: 14px 0;
+    font-size: 12px;
   }
   .wikitable th {
     background: var(--nd-bg-sidebar);
     border: 1px solid var(--nd-border);
-    padding: 8px 12px;
+    padding: 7px 10px;
     color: #fff;
     font-weight: 600;
     text-align: left;
   }
   .wikitable td {
     border: 1px solid var(--nd-border);
-    padding: 8px 12px;
+    padding: 7px 10px;
     color: var(--nd-text);
   }
   .wikitable tr:hover td {
@@ -407,12 +428,12 @@
   .keyboard-key {
     display: inline-block;
     border: 1px solid #44444c;
-    box-shadow: 0 2px 0 #202024;
+    box-shadow: 0 2px 0 #1b1b1e;
     border-radius: 3px;
     background: #18181b;
     color: #ffffff;
     margin: 0 2px;
-    padding: 1px 6px;
+    padding: 1px 5px;
     font-family: Consolas, monospace;
     font-size: 11px;
     font-weight: 600;
@@ -420,12 +441,12 @@
 
   code, kbd {
     font-family: Consolas, monospace;
-    font-size: 12px;
+    font-size: 11.5px;
     color: #f5c518;
     background: var(--nd-code-bg);
     border: 1px solid var(--nd-code-border);
-    padding: 1px 5px;
-    border-radius: 3px;
+    padding: 1px 4px;
+    border-radius: 2px;
   }
 
   /* Definitions & Property list */
@@ -435,7 +456,7 @@
     margin-top: 10px;
   }
   dl dd {
-    margin-left: 20px;
+    margin-left: 18px;
     margin-bottom: 6px;
     color: var(--nd-text);
   }
@@ -444,9 +465,9 @@
   .image-card {
     background: #111114;
     border: 1px solid var(--nd-border);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
-    margin: 16px 0 22px 0;
+    margin: 14px 0 20px 0;
   }
   .image-card img {
     width: 100%;
@@ -454,10 +475,10 @@
     cursor: zoom-in;
   }
   .image-caption {
-    padding: 8px 14px;
+    padding: 7px 12px;
     background: var(--nd-bg-card);
     border-top: 1px solid var(--nd-border);
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--nd-text-muted);
   }
 
@@ -465,7 +486,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 12px;
-    margin: 16px 0;
+    margin: 14px 0;
   }
   .gallery-card {
     background: var(--nd-bg-card);
@@ -485,15 +506,15 @@
     display: block;
   }
   .gallery-card-cap {
-    padding: 8px 10px;
-    font-size: 11.5px;
+    padding: 7px 10px;
+    font-size: 11px;
     color: var(--nd-text-muted);
   }
 
   /* Category links at bottom */
   #catlinks {
-    margin-top: 40px;
-    padding: 8px 14px;
+    margin-top: 36px;
+    padding: 8px 12px;
     background: var(--nd-bg-card);
     border: 1px solid var(--nd-border);
     border-radius: 3px;
@@ -507,10 +528,10 @@
 
   /* Footer */
   #footer {
-    margin-top: 30px;
-    padding-top: 16px;
+    margin-top: 26px;
+    padding-top: 14px;
     border-top: 1px solid var(--nd-border);
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--nd-text-dim);
   }
 
@@ -535,28 +556,28 @@
 
   @media (max-width: 900px) {
     #sidebar { display: none; }
-    #main-content { margin-left: 0; padding: 16px; }
-    .infobox-card { float: none; width: 100%; margin: 16px 0; }
+    #main-content { margin-left: 0; padding: 14px; }
+    .infobox-card { float: none; width: 100%; margin: 14px 0; }
   }
 </style>
 </head>
 <body>
 
-<!-- Top Fixed Header -->
+<!-- Top Header -->
 <header id="top-bar">
   <a class="brand-area" href="#top">
     <img src="assets/logo.png" alt="NoDraw Logo" class="brand-logo">
     <div>
       <div class="brand-title">No<span>Draw</span></div>
-      <div class="brand-sub">LEVEL DESIGN DOCUMENTATION</div>
+      <div class="brand-sub">LEVEL EDITOR DOCUMENTATION</div>
     </div>
   </a>
 
   <div class="header-actions">
-    <span style="font-size:12px;color:var(--nd-text-dim);">Closed Beta Build</span>
+    <span class="lang-tag">ENG / RU</span>
     <a href="downloads/nodraw-beta-tester.zip" class="btn-download-head" download>
       <img src="assets/icons/ui_gauge.png" class="icon-tool" alt="">
-      Скачать закрытый билд (17.5 МБ)
+      Download Beta (.ZIP)
     </a>
   </div>
 </header>
@@ -565,73 +586,73 @@
 <aside id="sidebar">
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/tool_select.png" class="icon-tool" alt=""> НАВИГАЦИЯ
+      <img src="assets/icons/tool_select.png" class="icon-tool" alt=""> NAVIGATION
     </div>
     <ul class="nav-list">
-      <li><a href="#top" class="active">Главная страница</a></li>
-      <li><a href="#Overview">Архитектура и Концепция</a></li>
-      <li><a href="#Interface">Интерфейс NoDraw</a></li>
-      <li><a href="#Download">Скачать для тестеров</a></li>
+      <li><a href="#top" class="active">Main Page</a></li>
+      <li><a href="#Overview">Architecture</a></li>
+      <li><a href="#Interface">User Interface</a></li>
+      <li><a href="#Download">Beta Download</a></li>
     </ul>
   </div>
 
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/act_merge.png" class="icon-tool" alt=""> МОДЕЛИРОВАНИЕ И МЕШИ
+      <img src="assets/icons/act_merge.png" class="icon-tool" alt=""> MESH &amp; BRUSHES
     </div>
     <ul class="nav-list">
       <li><a href="#Mesh_Modeling"><img src="assets/icons/act_merge.png" class="icon-tool" alt=""> CSG Boolean &amp; Carve</a></li>
-      <li><a href="#Mesh_Modeling"><img src="assets/icons/tool_mesh.png" class="icon-tool" alt=""> Extrude, Inset &amp; Bevel</a></li>
-      <li><a href="#Primitives"><img src="assets/icons/tool_block.png" class="icon-tool" alt=""> Фигуры и Примитивы</a></li>
+      <li><a href="#Mesh_Modeling"><img src="assets/icons/op_extrude.png" class="icon-tool" alt=""> Extrude, Inset &amp; Bevel</a></li>
+      <li><a href="#Primitives"><img src="assets/icons/prim_box.png" class="icon-tool" alt=""> Shapes &amp; Primitives</a></li>
     </ul>
   </div>
 
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> ДИСПЛЕЙСМЕНТЫ
+      <img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> DISPLACEMENTS
     </div>
     <ul class="nav-list">
-      <li><a href="#Displacements"><img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> Скульптинг и Кисти</a></li>
-      <li><a href="#Displacements"><img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> Стек модификаторов</a></li>
-      <li><a href="#Displacements"><img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> Auto-Sew и Сшив швов</a></li>
+      <li><a href="#Displacements"><img src="assets/icons/tool_disp.png" class="icon-tool" alt=""> Sculpt Brushes</a></li>
+      <li><a href="#Displacements"><img src="assets/icons/ui_stack.png" class="icon-tool" alt=""> Modifier Stack</a></li>
+      <li><a href="#Displacements"><img src="assets/icons/seam_sew.png" class="icon-tool" alt=""> Auto-Sew Seams</a></li>
     </ul>
   </div>
 
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/tool_path.png" class="icon-tool" alt=""> СПЛАЙНЫ И ПУТИ
+      <img src="assets/icons/tool_path.png" class="icon-tool" alt=""> SPLINES &amp; PATHS
     </div>
     <ul class="nav-list">
-      <li><a href="#Paths"><img src="assets/icons/tool_path.png" class="icon-tool" alt=""> Path Tool &amp; Сплайны</a></li>
-      <li><a href="#Paths"><img src="assets/icons/tool_path.png" class="icon-tool" alt=""> Дороги, реки, стены</a></li>
-      <li><a href="#Paths"><img src="assets/icons/tool_sprinkle.png" class="icon-tool" alt=""> Расстановка пропов</a></li>
+      <li><a href="#Paths"><img src="assets/icons/tool_path.png" class="icon-tool" alt=""> Path Tool</a></li>
+      <li><a href="#Paths"><img src="assets/icons/path_ribbon.png" class="icon-tool" alt=""> Roads, Walls &amp; Tunnels</a></li>
+      <li><a href="#Paths"><img src="assets/icons/path_props.png" class="icon-tool" alt=""> Prop Distribution</a></li>
     </ul>
   </div>
 
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/lighting_preview.png" class="icon-tool" alt=""> ОСВЕЩЕНИЕ И ШЕЙДЕРЫ
+      <img src="assets/icons/ent_light.png" class="icon-tool" alt=""> LIGHTING &amp; SHADERS
     </div>
     <ul class="nav-list">
-      <li><a href="#Lighting"><img src="assets/icons/lighting_preview.png" class="icon-tool" alt=""> Halton 162-ray Lightbake</a></li>
-      <li><a href="#Materials"><img src="assets/icons/asset_material.png" class="icon-tool" alt=""> Материалы и UV Lock</a></li>
-      <li><a href="#Shaders"><img src="assets/icons/skybox_2d.png" class="icon-tool" alt=""> Вода и 2D Скайбокс</a></li>
-      <li><a href="#Selection"><img src="assets/icons/vis_group_visible.png" class="icon-tool" alt=""> Stencil Outline (AA)</a></li>
+      <li><a href="#Lighting"><img src="assets/icons/ent_light.png" class="icon-tool" alt=""> 162-ray Halton Lightbake</a></li>
+      <li><a href="#Materials"><img src="assets/icons/asset_material.png" class="icon-tool" alt=""> Materials &amp; UV Lock</a></li>
+      <li><a href="#Shaders"><img src="assets/icons/skybox_2d.png" class="icon-tool" alt=""> Water &amp; 2D Skybox</a></li>
+      <li><a href="#Selection"><img src="assets/icons/auto_select.png" class="icon-tool" alt=""> Stencil Outline (AA)</a></li>
     </ul>
   </div>
 
   <div class="nav-group">
     <div class="nav-header">
-      <img src="assets/icons/ui_terminal.png" class="icon-tool" alt=""> ИНСТРУМЕНТЫ И СБОРКА
+      <img src="assets/icons/ui_terminal.png" class="icon-tool" alt=""> TOOLS &amp; PIPELINE
     </div>
     <ul class="nav-list">
-      <li><a href="#Collision"><img src="assets/icons/physics_tool_icon.png" class="icon-tool" alt=""> Коллизии .PHY</a></li>
-      <li><a href="#Logic"><img src="assets/icons/tool_entity.png" class="icon-tool" alt=""> Связи Entity I/O</a></li>
+      <li><a href="#Collision"><img src="assets/icons/act_to_disp.png" class="icon-tool" alt=""> .PHY Collision Parser</a></li>
+      <li><a href="#Logic"><img src="assets/icons/tool_entity.png" class="icon-tool" alt=""> Entity I/O Connections</a></li>
       <li><a href="#Automation"><img src="assets/icons/ui_rocket_launch.png" class="icon-tool" alt=""> Lump 40 Packfile</a></li>
-      <li><a href="#Automation"><img src="assets/icons/tool_mesh.png" class="icon-tool" alt=""> Propper StudioMDL</a></li>
-      <li><a href="#Playtest"><img src="assets/icons/control_play.png" class="icon-tool" alt=""> Playtest (F6)</a></li>
-      <li><a href="#Online"><img src="assets/icons/ui_terminal.png" class="icon-tool" alt=""> Online Режим (WIP)</a></li>
-      <li><a href="#MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-tool" alt=""> AI Интеграция (MCP)</a></li>
+      <li><a href="#Automation"><img src="assets/icons/menu_propper.png" class="icon-tool" alt=""> Propper StudioMDL</a></li>
+      <li><a href="#Playtest"><img src="assets/icons/particle_play.png" class="icon-tool" alt=""> Playtest (F6) Mode</a></li>
+      <li><a href="#Online"><img src="assets/icons/menu_online.png" class="icon-tool" alt=""> Online Co-Edit (WIP)</a></li>
+      <li><a href="#MCP"><img src="assets/icons/menu_mcp.png" class="icon-tool" alt=""> MCP AI Integration</a></li>
     </ul>
   </div>
 </aside>
@@ -639,438 +660,441 @@
 <!-- Main Documentation Content -->
 <main id="main-content">
   <div class="doc-crumb">
-    <span>Документация</span> › <span>Level Design</span> › <span style="color:var(--nd-gold);">NoDraw</span>
+    <span>Documentation</span> › <span>Level Design</span> › <span style="color:var(--nd-gold);">NoDraw</span>
   </div>
 
   <h1 class="page-title">NoDraw</h1>
-  <div class="page-subtitle">Техническая документация и руководство пользователя редактора карт</div>
+  <div class="page-subtitle">Next-Generation Source Engine Level Editor — Technical Documentation &amp; Manual</div>
 
-  <!-- Right Infobox Card -->
+  <!-- Right Infobox Card (Logo Only at Top) -->
   <aside class="infobox-card">
     <div class="infobox-head">NoDraw Level Editor</div>
-    <div class="infobox-sub">Современный редактор карт для Source Engine и Garry's Mod</div>
-    <div class="infobox-preview">
-      <img src="assets/nodraw_ui_main.png" alt="NoDraw Interface Preview" onclick="openModal('assets/nodraw_ui_main.png')">
+    <div class="infobox-sub">Source 1 &amp; Garry's Mod Mapping Environment</div>
+    <div class="infobox-logo-wrap">
+      <img src="assets/logo.png" alt="NoDraw Official Logo">
     </div>
     <table class="infobox-grid">
       <tr>
-        <th>Разработчик</th>
+        <th>Developer</th>
         <td>env_snake</td>
       </tr>
       <tr>
-        <th>Текущая версия</th>
+        <th>Current Build</th>
         <td><code>0.1.0-beta</code> (2026-11-03)</td>
       </tr>
       <tr>
-        <th>Архитектура</th>
-        <td>Rust + WebGPU (64-bit нативный)</td>
+        <th>Architecture</th>
+        <td>Rust + WebGPU (64-bit native)</td>
       </tr>
       <tr>
-        <th>Рендер-бэкенд</th>
+        <th>Render Backend</th>
         <td>Vulkan, DirectX 12</td>
       </tr>
       <tr>
-        <th>Целевой движок</th>
+        <th>Target Engines</th>
         <td>Source Engine (Source 1), Garry's Mod</td>
       </tr>
       <tr>
-        <th>Форматы карт</th>
+        <th>Map Formats</th>
         <td><code>.vmf</code>, <code>.bsp</code>, <code>.vmx</code></td>
       </tr>
       <tr>
-        <th>Форматы моделей</th>
+        <th>Model Formats</th>
         <td><code>.mdl</code>, <code>.vvd</code>, <code>.vtx</code>, <code>.phy</code></td>
       </tr>
       <tr>
-        <th>Тип релиза</th>
-        <td>Закрытое тестирование (Zero-Install)</td>
+        <th>Distribution</th>
+        <td>Closed Beta (Portable Standalone)</td>
       </tr>
     </table>
     <div class="infobox-btn-wrap">
-      <a href="downloads/nodraw-beta-tester.zip" class="btn-download-head" style="justify-content:center;" download>
+      <a href="downloads/nodraw-beta-tester.zip" class="btn-download-head" style="justify-content:center;width:100%;" download>
         <img src="assets/icons/ui_gauge.png" class="icon-tool" alt="">
-        Скачать билд (17.5 МБ)
+        Download Closed Beta (17.5 MB)
       </a>
     </div>
   </aside>
 
   <!-- Lead Paragraph -->
   <p>
-    <b>NoDraw</b> — высокопроизводительный нативный 64-битный редактор карт для движка <b>Source Engine</b> и платформы <b>Garry's Mod</b>, написанный с нуля на языке <b>Rust</b> с использованием графического API <b>WebGPU (wgpu)</b>.
+    <b>NoDraw</b> is a high-performance, 64-bit standalone level editor for the <b>Source Engine</b> and <b>Garry's Mod</b>, engineered from the ground up in <b>Rust</b> on top of <b>WebGPU (wgpu)</b>.
   </p>
   <p>
-    Редактор спроектирован как полноценная замена и прямой преемник <b>Hammer++</b> и оригинального Valve Hammer Editor. Главная цель проекта — полное избавление от устаревшего 32-битного MFC-кода конца 1990-х годов, исключение случайных вылетов при работе со сложными сценами и внедрение современных инструментов левел-дизайна: физически корректного превью-света, сглаженного трафаретного выделения объектов, точного парсинга коллизий, процедурного террейна и встроенной упаковки контента.
+    Designed as the direct successor to <b>Hammer++</b> and Valve's legacy Hammer Editor, NoDraw removes decades of 32-bit MFC legacy constraints from 1998. It eliminates out-of-memory crashes on dense scenes and introduces modern level design workflows: real-time physical lighting previews, subpixel anti-aliased stencil outlines, precise Havok physics collision visualization, procedural displacement modifier stacks, and built-in BSP lump packing.
   </p>
 
   <div class="callout-box callout-important">
-    <b>Чистая интеграция с игрой:</b> NoDraw напрямую читает оригинальные директории Steam, файлы <code>gameinfo.txt</code> и списки монтирования <code>mount.cfg</code>. Редактор не требует замены системных DLL игры или внедрения сторонних инжекторов.
+    <b>Clean Game Integration:</b> NoDraw reads directly from official Steam libraries, <code>gameinfo.txt</code> search paths, and <code>mount.cfg</code> mounts. The editor requires no game DLL replacements or engine hooks. All maps saved by NoDraw remain 100% compliant with standard Source SDK compilers (<code>vbsp</code>, <code>vvis</code>, <code>vrad</code>).
   </div>
 
   <!-- Table of Contents -->
   <div class="toc-box" id="toc">
     <div class="toc-title-row">
-      <span>Содержание документации</span>
-      <span class="toc-toggle" onclick="toggleToc()">[скрыть]</span>
+      <span>Contents</span>
+      <span class="toc-toggle" onclick="toggleToc()">[hide]</span>
     </div>
     <ul class="toc-list" id="toc-list">
-      <li><span class="toc-num">1</span> <a href="#Overview">Архитектура и Концепция</a></li>
-      <li><span class="toc-num">2</span> <a href="#Interface">Рабочий интерфейс редактора</a></li>
-      <li><span class="toc-num">3</span> <a href="#Mesh_Modeling">Моделирование брашей и мешей (CSG, Carve, Extrude, Bevel)</a></li>
-      <li><span class="toc-num">4</span> <a href="#Primitives">Фигуры и Генераторы примитивов</a></li>
-      <li><span class="toc-num">5</span> <a href="#Displacements">Дисплейсменты и Ландшафт (Скульптинг, Модификаторы)</a></li>
-      <li><span class="toc-num">6</span> <a href="#Paths">Сплайны и Инструмент путей (Path Tool)</a></li>
-      <li><span class="toc-num">7</span> <a href="#Lighting">Освещение: Halton 162-ray Lightbake</a></li>
-      <li><span class="toc-num">8</span> <a href="#Materials">Редактор материалов и Текстурирование</a></li>
-      <li><span class="toc-num">9</span> <a href="#Shaders">Движковые шейдеры (Вода и 2D-скайбокс)</a></li>
-      <li><span class="toc-num">10</span> <a href="#Selection">Выделение Stencil и Пайплайн коллизий .PHY</a></li>
-      <li><span class="toc-num">11</span> <a href="#Logic">Связи энтити и Графы I/O</a></li>
-      <li><span class="toc-num">12</span> <a href="#Automation">Автоматизация: Propper, Lump 40 Pack, Sprinkle</a></li>
-      <li><span class="toc-num">13</span> <a href="#Playtest">Режим мгновенного осмотра Playtest (F6)</a></li>
-      <li><span class="toc-num">14</span> <a href="#Online">Сетевой режим совместной работы (WIP)</a></li>
-      <li><span class="toc-num">15</span> <a href="#MCP">Интеграция с ИИ через Model Context Protocol (MCP)</a></li>
-      <li><span class="toc-num">16</span> <a href="#Comparison">Сравнение характеристик с Hammer++</a></li>
-      <li><span class="toc-num">17</span> <a href="#Hotkeys">Горячие клавиши NoDraw</a></li>
-      <li><span class="toc-num">18</span> <a href="#Download">Установка и пакет для тестеров</a></li>
+      <li><span class="toc-num">1</span> <a href="#Overview">Overview &amp; Core Architecture</a></li>
+      <li><span class="toc-num">2</span> <a href="#Interface">Interface &amp; Workspace Layout</a></li>
+      <li><span class="toc-num">3</span> <a href="#Mesh_Modeling">Brush &amp; Mesh Modeling (CSG, Carve, Extrude, Bevel)</a></li>
+      <li><span class="toc-num">4</span> <a href="#Primitives">Shapes &amp; Primitive Generators</a></li>
+      <li><span class="toc-num">5</span> <a href="#Displacements">Displacements &amp; Terrain (Sculpting, Modifier Stack)</a></li>
+      <li><span class="toc-num">6</span> <a href="#Paths">Splines &amp; Path Tool</a></li>
+      <li><span class="toc-num">7</span> <a href="#Lighting">Lighting: 162-ray Halton Lightbake</a></li>
+      <li><span class="toc-num">8</span> <a href="#Materials">Material Editor &amp; Texturing</a></li>
+      <li><span class="toc-num">9</span> <a href="#Shaders">Engine Shaders (Water Refraction &amp; 2D Skybox)</a></li>
+      <li><span class="toc-num">10</span> <a href="#Selection">Selection Stencil &amp; .PHY Collision Pipeline</a></li>
+      <li><span class="toc-num">11</span> <a href="#Logic">Entity I/O &amp; Connection Graphs</a></li>
+      <li><span class="toc-num">12</span> <a href="#Automation">Automation: Propper, Lump 40 Pack, Sprinkle</a></li>
+      <li><span class="toc-num">13</span> <a href="#Playtest">In-Editor Playtest Mode (F6)</a></li>
+      <li><span class="toc-num">14</span> <a href="#Online">Online Collaborative Editing (WIP)</a></li>
+      <li><span class="toc-num">15</span> <a href="#MCP">Model Context Protocol (MCP) AI Integration</a></li>
+      <li><span class="toc-num">16</span> <a href="#Comparison">Hammer++ vs NoDraw Specification</a></li>
+      <li><span class="toc-num">17</span> <a href="#Hotkeys">Keyboard Shortcuts</a></li>
+      <li><span class="toc-num">18</span> <a href="#Download">Download &amp; Installation</a></li>
     </ul>
   </div>
 
   <!-- 1. Overview -->
-  <h2 id="Overview"><img src="assets/icons/tool_camera.png" class="icon-h2" alt=""> 1. Архитектура и Концепция</h2>
+  <h2 id="Overview"><img src="assets/icons/tool_camera.png" class="icon-h2" alt=""> 1. Overview &amp; Core Architecture</h2>
   <p>
-    Оригинальный Valve Hammer Editor создавался под Windows 95/98 на базе библиотек MFC. Даже в модификации Hammer++ редактор упирается в ограничения 32-битного адресного пространства (максимум 3.5 ГБ оперативной памяти), частые краши при работе со сложными мешами и фиксированный конвейер OpenGL.
+    Valve's Hammer Editor was historically bound to 32-bit Windows MFC architectures, limiting memory allocation to 3.2 GB and causing frequent crashes on complex scenes with high polygon and entity counts.
   </p>
   <p>
-    <b>Фундаментальные отличия NoDraw:</b>
+    <b>Key architectural advantages of NoDraw:</b>
   </p>
   <ul>
-    <li><b>Память и надежность:</b> 100% безопасная работа с памятью на Rust. Ошибки сегментации, переполнения буфера при манипуляции вертексами брашей и повреждения кучи исключены на уровне компилятора.</li>
-    <li><b>Современный графический стек:</b> Движок рендеринга на WebGPU задействует низкоуровневые очереди команд Vulkan / DirectX 12. Это обеспечивает стабильные 60+ FPS на сценах с сотнями тысяч полигонов и десятками тысяч динамических пропов.</li>
-    <li><b>Детерминированные транзакции (Undo/Redo):</b> Вся сцена изолирована в системе транзакций. Каждая операция (от перемещения одного вертекса до массивного карвинга) откатывается и накатывается мгновенно без потери данных.</li>
+    <li><b>Memory Safety (Rust):</b> Guaranteed memory safety through compile-time ownership semantics. Eliminates pointer corruption, buffer overflows, and crashes during vertex manipulation.</li>
+    <li><b>WebGPU Hardware Acceleration:</b> Low-overhead Vulkan and DirectX 12 command queues deliver a sustained 60+ FPS across hundreds of thousands of brush polygons and dense dynamic prop arrays.</li>
+    <li><b>Deterministic Undo Transactions:</b> Every editor action is recorded in transactional trees, enabling instantaneous undo/redo operations without risk of state drift or file corruption.</li>
   </ul>
 
   <!-- 2. Interface -->
-  <h2 id="Interface"><img src="assets/icons/tool_select.png" class="icon-h2" alt=""> 2. Рабочий интерфейс редактора</h2>
+  <h2 id="Interface"><img src="assets/icons/tool_select.png" class="icon-h2" alt=""> 2. Interface &amp; Workspace Layout</h2>
   <p>
-    Интерфейс NoDraw оптимизирован для максимальной концентрации на геометрии карты:
+    The user workspace is designed for maximum geometric clarity:
   </p>
 
   <div class="image-card">
-    <img src="assets/nodraw_ui_main.png" alt="Рабочее окно NoDraw" onclick="openModal('assets/nodraw_ui_main.png')">
+    <img src="assets/nodraw_ui_main.png" alt="NoDraw 4-Viewport Workspace" onclick="openModal('assets/nodraw_ui_main.png')">
     <div class="image-caption">
-      <b>Рис. 1:</b> Четырёхоконная компоновка NoDraw: 3D Shaded Viewport, 2D Top (X/Y), 2D Front (Y/Z), 2D Side (X/Z), боковая панель Tool/Properties и нижний проводник Assets.
+      <b>Fig. 1:</b> Four-viewport layout: 3D Shaded Viewport, 2D Top (X/Y), 2D Front (Y/Z), 2D Side (X/Z), Properties Inspector, and Assets Browser.
     </div>
   </div>
 
   <ul>
-    <li><b>Панель инструментов слева:</b> Быстрый выбор ключевых режимов — Select, Zoom, Camera, Block, Polygon, Mesh, Clip, Disp, Path, Entity, Decal, Overlay, Sprinkle, Drop, Face, Apply.</li>
-    <li><b>Инспектор справа (Tool / Properties / Details):</b> Управление объектами (Displacements, Brushes), булевы операции (Carve, Hollow, Clip, Merge, To entity, To disp), параметры привязки и режим Gizmo.</li>
-    <li><b>Проводник ассетов снизу (Assets Explorer):</b> Индексация десятков тысяч материалов (VMT), моделей (MDL), звуков и частиц. Мгновенный поиск, просмотр текстур и наложение на грани в один клик.</li>
+    <li><b>Left Tool Strip:</b> Direct access to Selection, Zoom, Camera, Block, Polygon, Mesh, Clip, Displacements, Path Splines, Entities, Decals, Overlays, and Sprinkling.</li>
+    <li><b>Right Inspector (Tool / Properties / Details):</b> Deep parameter management for solids, displacements, boolean cutters, snapping grids, and 3D transform gizmos.</li>
+    <li><b>Bottom Assets Explorer:</b> Instant indexing across thousands of VMT materials, MDL models, sounds, and particles with live search and drag-and-drop texture assignment.</li>
   </ul>
 
   <!-- 3. Mesh Modeling -->
-  <h2 id="Mesh_Modeling"><img src="assets/icons/act_merge.png" class="icon-h2" alt=""> 3. Моделирование брашей и мешей</h2>
+  <h2 id="Mesh_Modeling"><img src="assets/icons/act_merge.png" class="icon-h2" alt=""> 3. Brush &amp; Mesh Modeling</h2>
   <p>
-    NoDraw объединяет классическую работу с брашами Source Engine и современные методы полигонального моделирования:
+    NoDraw bridges the gap between classic BSP brush construction and contemporary polygon modeling:
   </p>
   <dl>
-    <dt>Неразрушающий CSG Boolean</dt>
-    <dd>Операции <code>Union</code> (объединение), <code>Difference</code> (вычитание) и <code>Intersect</code> (пересечение). Резцы сохраняются в стеке как скрытые параметры и могут редактироваться в любой момент до запекания (Bake).</dd>
+    <dt>Non-Destructive Boolean CSG</dt>
+    <dd>Supports <code>Union</code>, <code>Difference</code>, and <code>Intersect</code> operations. Cutters remain stored in an editable parameter stack until explicitly baked, allowing adjustments to wall openings and archways without destructive cuts.</dd>
     <dt>Smart Carve</dt>
-    <dd>В отличие от старого Carve в Hammer, нарезавшего геометрию на хаотичные микро-полигоны, NoDraw выполняет вычитание клиньями вокруг проема, сохраняя строгую выпуклость (Convex) брашей для движка BSP.</dd>
-    <dt>Операции с мешами: Extrude, Inset и Bevel</dt>
-    <dd>Прямое моделирование граней: вытягивание граней (<code>Extrude</code>) вдоль нормали или вектора, создание внутренних контурных рамок (<code>Inset</code>), скругление рёбер с настраиваемым радиусом и шагом сегментов (<code>Bevel</code>).</dd>
-    <dt>Вертексное редактирование с защитой UV Lock</dt>
-    <dd>Манипуляция вершинами и рёбрами в 2D и 3D окнах с автоматическим пересчетом осей текстуры, исключающим перекос развёртки на смежных нетронутых гранях.</dd>
+    <dd>Replaces Hammer's legacy Carve tool. Carves openings using clean radial wedges around holes, ensuring strictly convex, BSP-compliant brushes without generating degenerate geometry.</dd>
+    <dt>Mesh Operations: Extrude, Inset &amp; Bevel</dt>
+    <dd>Direct face manipulation: extrude faces along surface normals or custom directional deltas; inset face perimeters; bevel brush edges with configurable radius and segment subdivisions.</dd>
+    <dt>Vertex Editing with UV Lock</dt>
+    <dd>Edit vertices and edges in 2D and 3D views while automatically maintaining texture projection axes across untouched faces.</dd>
   </dl>
 
   <!-- 4. Primitives -->
-  <h2 id="Primitives"><img src="assets/icons/tool_block.png" class="icon-h2" alt=""> 4. Фигуры и Генераторы примитивов</h2>
+  <h2 id="Primitives"><img src="assets/icons/prim_box.png" class="icon-h2" alt=""> 4. Shapes &amp; Primitive Generators</h2>
   <p>
-    Параметрическое создание архитектурных объёмов без ручного вычерчивания:
+    Procedural generation of complex architectural volumes:
   </p>
   <ul>
-    <li><b>Базовые объёмы:</b> Блоки, клинья, цилиндры, конусы, шипы и геодезические сферы.</li>
-    <li><b>Архитектурные арки и торусы:</b> Настройка внешнего и внутреннего радиуса, толщины стенок, угла раскрытия дуги (0°..360°) и числа сегментов скругления.</li>
-    <li><b>Генератор лестниц:</b> Прямые ступени вдоль осей с авто-подгонкой высоты под шаг игрока (18 юнитов) и <b>Винтовые спиральные лестницы (Spiral Stairs)</b> с регулировкой оборотов, радиуса и числа ступеней.</li>
+    <li><b>Standard Volumes:</b> Parametric boxes, wedges, cylinders, cones, spikes, and geodesic spheres.</li>
+    <li><b>Arches &amp; Toruses:</b> Configurable inner/outer radii, wall thickness, radial subdivisions, and sweep arcs from 0° to 360°.</li>
+    <li><b>Staircase Generators:</b> Linear steps along designated axes or parametric <b>Spiral Stairs</b> with customizable turns, step height, and inner radius.</li>
   </ul>
 
   <!-- 5. Displacements -->
-  <h2 id="Displacements"><img src="assets/icons/tool_disp.png" class="icon-h2" alt=""> 5. Дисплейсменты и Ландшафт</h2>
+  <h2 id="Displacements"><img src="assets/icons/tool_disp.png" class="icon-h2" alt=""> 5. Displacements &amp; Terrain Sculpting</h2>
   <p>
-    Комплексная система создания природного рельефа на базе дисплейсментов Source:
+    Advanced terrain sculpting built on Source Engine displacements:
   </p>
   <dl>
-    <dt>Интерактивные кисти скульпта (Sculpt Tool)</dt>
-    <dd>Прямая лепка поверхности в 3D виде: кисти <code>Raise</code>, <code>Lower</code>, <code>Smooth</code>, <code>Relax</code>, <code>Flatten</code>, <code>Noise</code>, <code>Inflate</code> и <code>Smudge</code> (сдвиг вершин по направлению мазка) с плавным спадом радиуса.</dd>
-    <dt>Неразрушающий стек модификаторов (Modifier Stack)</dt>
-    <dd>Наложение процедурных слоёв поверх базовой сетки: <code>HeightSmooth</code>, <code>SurfaceSmooth</code>, <code>Terrace</code> (террасы), <code>Erosion</code> (симуляция эрозии), <code>Strata</code> (слоистые скалы), <code>Noise</code>, <code>Bend</code>, <code>Twist</code>, <code>Taper</code>.</dd>
-    <dt>Автоматический сшив швов (Auto-Sew Seams &amp; T-Junctions)</dt>
-    <dd>Автоматический поиск и бесшовное сшивание вершин соседних дисплейсментов, полностью исключающее видимые трещины и дыры между пачами.</dd>
-    <dt>Блендинг по уклону нормалей (Blend by slope)</dt>
-    <dd>Автоматическая покраска альфа-канала двухслойных текстур: скалистые отвесы получают текстуру камня, а пологие вершины — траву или песок.</dd>
+    <dt>Interactive Sculpting Brushes</dt>
+    <dd>Sculpt displacement surfaces in real time using <code>Raise</code>, <code>Lower</code>, <code>Smooth</code>, <code>Relax</code>, <code>Flatten</code>, <code>Noise</code>, <code>Inflate</code>, and <code>Smudge</code> brushes with smooth radial falloffs.</dd>
+    <dt>Non-Destructive Modifier Stack</dt>
+    <dd>Stack parametric procedural modifiers evaluated on top of the displacement base: <code>HeightSmooth</code>, <code>SurfaceSmooth</code>, <code>Terrace</code> (stepped landforms), <code>Erosion</code> (hydraulic/gravity simulation), <code>Strata</code> (geological rock layers), <code>Noise</code>, <code>Bend</code>, <code>Twist</code>, and <code>Taper</code>.</dd>
+    <dt>Auto-Sew Seams &amp; T-Junctions</dt>
+    <dd>Automatic detection and welding of adjacent displacement edges, resolving cracks, tears, and vertex seams between differing power levels.</dd>
+    <dt>Slope-Based Alpha Blending</dt>
+    <dd>Automatically paints <code>WorldVertexTransition</code> materials according to normal slope: steep cliffs receive rock textures, while flat ground transitions to grass or dirt.</dd>
   </dl>
 
   <!-- 6. Paths -->
-  <h2 id="Paths"><img src="assets/icons/tool_path.png" class="icon-h2" alt=""> 6. Сплайны и Инструмент путей (Path Tool)</h2>
+  <h2 id="Paths"><img src="assets/icons/tool_path.png" class="icon-h2" alt=""> 6. Splines &amp; Path Tool</h2>
   <p>
-    Инструмент трассировки сплайнов Безье:
+    Construct complex curved structures via Bezier splines:
   </p>
   <ul>
-    <li><b>Деформация террейна:</b> Прорезание плавных дорог, русел рек, хребтов и защитных траншей через дисплейсменты.</li>
-    <li><b>Протяжка профилей:</b> Вытягивание лент дорог (<code>strip</code>), отвесных скальных стен (<code>wall</code>), бордюров, труб и прямоугольных тоннелей (<code>cut</code>).</li>
-    <li><b>Расстановка пропов вдоль кривой:</b> Автоматическое размещение заборов, столбов освещения и растительности вдоль сплайна с шагом, отступом и случайным разбросом (jitter).</li>
+    <li><b>Terrain Shaping:</b> Carve roads, water channels, mountain ridges, and trenches through existing displacements.</li>
+    <li><b>Profile Sweeping:</b> Extrude ribbons of geometry along curves to generate road surfaces (<code>strip</code>), cliff walls (<code>wall</code>), curbs, pipes, and tunnels (<code>cut</code>).</li>
+    <li><b>Prop Distribution:</b> Scatter models (fence posts, street lamps, trees) along curves with defined spacing, height offsets, and rotational jitter.</li>
   </ul>
 
   <!-- 7. Lighting -->
-  <h2 id="Lighting"><img src="assets/icons/lighting_preview.png" class="icon-h2" alt=""> 7. Освещение: Halton 162-ray Lightbake</h2>
+  <h2 id="Lighting"><img src="assets/icons/ent_light.png" class="icon-h2" alt=""> 7. Lighting: 162-ray Halton Lightbake</h2>
   <p>
-    NoDraw рассчитывает честный свет прямо в окне редактирования:
+    Calculates physically grounded lighting directly within the editor:
   </p>
   <div class="image-card">
     <img src="assets/preview_lighting.png" alt="Halton 162-ray Lighting Preview" onclick="openModal('assets/preview_lighting.png')">
     <div class="image-caption">
-      <b>Рис. 2:</b> Честный превью-свет: физический расчет непрямого света, мягкие тени от источников и Ambient Occlusion.
+      <b>Fig. 2:</b> Physical lighting preview: indirect bounced light, smooth spotlight cones, and Ambient Occlusion calculated in seconds.
     </div>
   </div>
   <ul>
-    <li><b>162 квазислучайных луча Халтона (Halton 2, 3):</b> Трассировка полусферы над каждой вершиной модели для расчета непрямого рассеянного света и окклюзии неба.</li>
-    <li><b>Квадратичный спад спотлайтов:</b> Строгое следование формулам Source SDK 2013 <code>ComputeLightAtPoints</code> с плавным косинусным переходом между внутренним и внешним конусом.</li>
-    <li><b>Честный LDR-контраст:</b> Отсутствие искусственного завышения гаммы и высветления теней. Картинка в окне соответствует результату компилятора VRAD.</li>
+    <li><b>162 Halton Rays per Vertex:</b> Evaluates hemispherical quasi-random Halton (2, 3) samples per vertex to compute sky occlusion and indirect light bounce.</li>
+    <li><b>Quadratic Spotlight Attenuation:</b> Strict implementation of Source SDK 2013 <code>ComputeLightAtPoints</code> equations with smooth cosine transitions between inner and outer cones.</li>
+    <li><b>Strict LDR Pipeline:</b> Operates without soft-shoulder compression, preserving deep shadows and authentic high-contrast lighting matching VRAD compiler output.</li>
   </ul>
 
   <!-- 8. Materials -->
-  <h2 id="Materials"><img src="assets/icons/asset_material.png" class="icon-h2" alt=""> 8. Редактор материалов и Текстурирование</h2>
+  <h2 id="Materials"><img src="assets/icons/asset_material.png" class="icon-h2" alt=""> 8. Material Editor &amp; Texturing</h2>
   <ul>
-    <li><b>Индексатор 100k+ VMT:</b> Мгновенный поиск по всем смонтированным VPK и локальным папкам игры за 1-2 секунды.</li>
-    <li><b>Шейдерный инспектор:</b> Поддержка параметров <code>LightmappedGeneric</code>, <code>VertexLitGeneric</code>, <code>WorldVertexTransition</code>, <code>Water</code>, <code>Sprite</code>.</li>
-    <li><b>Face Edit:</b> Точная подгонка координат текстур: Fit, Justify, Shift, Scale, Rotate в режимах World и Face.</li>
-    <li><b>Служебные текстуры:</b> Быстрое назначение <code>tools/toolsnodraw</code>, <code>tools/toolsclip</code>, <code>tools/toolstrigger</code>, <code>tools/toolshint</code>, <code>tools/toolsskip</code> в один клик.</li>
+    <li><b>High-Speed Material Indexing:</b> Indexes over 100,000 VMT materials across mounted VPKs and game directories in 1–2 seconds.</li>
+    <li><b>Shader Inspection:</b> Native parsing of <code>LightmappedGeneric</code>, <code>VertexLitGeneric</code>, <code>WorldVertexTransition</code>, <code>Water</code>, and <code>Sprite</code> parameters.</li>
+    <li><b>Face Edit Controls:</b> Precision texture placement with Fit, Justify, Shift, Scale, and Rotate options across World and Face coordinates.</li>
+    <li><b>Utility Materials:</b> Rapid application of <code>tools/toolsnodraw</code>, <code>tools/toolsclip</code>, <code>tools/toolstrigger</code>, <code>tools/toolshint</code>, and <code>tools/toolsskip</code>.</li>
   </ul>
 
   <!-- 9. Shaders -->
-  <h2 id="Shaders"><img src="assets/icons/skybox_2d.png" class="icon-h2" alt=""> 9. Движковые шейдеры (Вода и 2D-скайбокс)</h2>
+  <h2 id="Shaders"><img src="assets/icons/skybox_2d.png" class="icon-h2" alt=""> 9. Engine Shaders (Water Refraction &amp; 2D Skybox)</h2>
   <ul>
-    <li><b>Шейдер воды Source:</b> Преломление дна (<code>refract: true</code>), рябь нормалей, отражение по Fresnel и экспоненциальный глубинный туман толщи воды по <code>$fogstart</code> / <code>$fogend</code>.</li>
-    <li><b>Бесшовный 2D-скайбокс:</b> Идеальное сведение всех 12 рёбер кубмапы неба (MSE = 0.0), полностью исключающее пирамидальное замятие в зените.</li>
-    <li><b>Спрайты и иконки:</b> Режим Unlit + Translucent без нелинейного искажения альфы. Устранены чёрные рамки вокруг иконок ламп и спрайтов.</li>
+    <li><b>Source Water Shader:</b> Executes real screen-space refraction (<code>refract: true</code>), surface ripples, Fresnel reflections, and exponential volumetric depth fog governed by <code>$fogstart</code> and <code>$fogend</code>.</li>
+    <li><b>Seamless 2D Skybox:</b> Mathematical continuity across all 12 cubemap edges (MSE = 0.0), eliminating zenith pinching and horizon alignment seams.</li>
+    <li><b>Sprite &amp; Entity Rendering:</b> Unlit + Translucent rendering without non-linear alpha distortion, removing dark rectangular artifacts around light bulbs and sprites.</li>
   </ul>
 
   <!-- 10. Selection & Physics -->
-  <h2 id="Selection"><img src="assets/icons/physics_tool_icon.png" class="icon-h2" alt=""> 10. Выделение Stencil и Пайплайн коллизий .PHY</h2>
+  <h2 id="Selection"><img src="assets/icons/auto_select.png" class="icon-h2" alt=""> 10. Selection Stencil &amp; .PHY Collision Pipeline</h2>
   <div class="image-card">
     <img src="assets/preview_outline.png" alt="Subpixel Stencil Silhouette Outline" onclick="openModal('assets/preview_outline.png')">
     <div class="image-caption">
-      <b>Рис. 3:</b> Субпиксельное трафаретное выделение моделей: чистый золотой силуэт без сетки треугольников.
+      <b>Fig. 3:</b> Subpixel Anti-Aliased Stencil Outline: models are encircled by a clean golden silhouette without interior wireframe clutter.
     </div>
   </div>
   <ul>
-    <li><b>Субпиксельный Stencil Outline:</b> Двухпроходный шейдер силуэта с 12-точечным радиальным фильтром сглаживания и параболическим затуханием. Модели выделяются мягким золотым контуром (<code>#f5c518</code>), сохраняя текстуру чистой.</li>
-    <li><b>Точные коллизии .PHY:</b> Исправлена пространственная ориентация осей Havok/IVP и добавлен фильтр копланарных рёбер (скрытие внутренних диагоналей плоских граней).</li>
+    <li><b>Subpixel Stencil Silhouette Outline:</b> A two-pass screen-space shader renders models into an <code>R8Unorm</code> mask and applies a 12-tap radial bilinear filter with parabolic alpha falloff. Produces smooth golden silhouettes (<code>#f5c518</code>) while keeping surface textures clear.</li>
+    <li><b>Precise .PHY Collision Pipeline:</b> Reconstructed Havok/IVP compact surface parser with corrected spatial transformations <code>[z·M, -x·M, -y·M]</code> and coplanar edge elimination (hiding interior diagonals on flat faces where normal dot product &gt; 0.985).</li>
   </ul>
 
   <!-- 11. Logic -->
-  <h2 id="Logic"><img src="assets/icons/tool_entity.png" class="icon-h2" alt=""> 11. Связи энтити и Графы I/O</h2>
+  <h2 id="Logic"><img src="assets/icons/tool_entity.png" class="icon-h2" alt=""> 11. Entity I/O &amp; Connection Graphs</h2>
   <ul>
-    <li><b>Инспектор связей Input/Output:</b> Визуальный просмотр триггеров, целевых энтити, входов, задержек (delay) и параметров.</li>
-    <li><b>Защита от опечаток:</b> Автоматический выбор targetname из списка существующих на карте энтити.</li>
-    <li><b>Парсер FGD:</b> Полная поддержка определений сущностей для всех игр Source (HL2, CSS, TF2, GMod).</li>
+    <li><b>Visual Connection Inspector:</b> Review all entity outputs, targeted entities, input actions, parameters, and firing delays.</li>
+    <li><b>Strict Typo Prevention:</b> Targetname selectors automatically list valid entities matching class criteria.</li>
+    <li><b>FGD Parser:</b> Fully parses Valve FGD files for Half-Life 2, Counter-Strike: Source, Team Fortress 2, and Garry's Mod.</li>
   </ul>
 
   <!-- 12. Automation -->
-  <h2 id="Automation"><img src="assets/icons/ui_rocket_launch.png" class="icon-h2" alt=""> 12. Автоматизация: Propper, Lump 40 Pack, Sprinkle</h2>
+  <h2 id="Automation"><img src="assets/icons/ui_rocket_launch.png" class="icon-h2" alt=""> 12. Automation: Propper, Lump 40 Pack, Sprinkle</h2>
   <ul>
-    <li><b>Встроенный Propper:</b> Преобразование брашей в <code>prop_static</code> с генерацией выпуклых коллизий (<code>$concave</code>) и вызовом StudioMDL.</li>
-    <li><b>Упаковка в BSP Lump 40 (Замена VIDE):</b> Автоматический поиск зависимостей карты (текстуры, звуки, модели) и прямая запись в pakfile BSP.</li>
-    <li><b>Sprinkle Tool:</b> Процедурный спавн пропов камней и мусора с учетом угла наклона поверхности и случайного поворота.</li>
+    <li><b>Integrated Propper Tool:</b> Convert brush assemblies directly into static prop models (<code>prop_static</code>) using StudioMDL, with customizable surface properties, mass, smoothing angles, and convex physics hulls (<code>$concave</code>).</li>
+    <li><b>Lump 40 Packfile (VIDE Replacement):</b> Automatically analyzes map dependencies and writes missing textures, models, sounds, and particles directly into the compiled BSP pakfile.</li>
+    <li><b>Sprinkle Tool:</b> Procedurally scatters props (e.g. foliage, pebbles, urban debris) over selected surfaces with slope constraints, height thresholds, and random yaw.</li>
   </ul>
 
   <!-- 13. Playtest -->
-  <h2 id="Playtest"><img src="assets/icons/control_play.png" class="icon-h2" alt=""> 13. Режим мгновенного осмотра Playtest (F6)</h2>
+  <h2 id="Playtest"><img src="assets/icons/particle_play.png" class="icon-h2" alt=""> 13. In-Editor Playtest Mode (F6)</h2>
   <p>
-    Мгновенная оценка пропорций и масштаба карты прямо в окне редактора:
+    Evaluate sightlines, scale, and navigation instantly without compiling:
   </p>
   <ul>
-    <li>Нажатие <span class="keyboard-key">F6</span> включает физику игрока (ходьба на WASD, прыжки на Space, приседания на Ctrl).</li>
-    <li>Клавиши <span class="keyboard-key">V</span> и <span class="keyboard-key">N</span> переключают в свободный полёт noclip со скоростью до 800 юнитов в секунду на Shift.</li>
+    <li>Press <span class="keyboard-key">F6</span> to enter a first-person player controller with gravity, collision detection, jumping (<span class="keyboard-key">Space</span>), and crouching (<span class="keyboard-key">Ctrl</span>).</li>
+    <li>Toggle noclip flight via <span class="keyboard-key">V</span> or <span class="keyboard-key">N</span> with flight speeds up to 800 units/second via <span class="keyboard-key">Shift</span>.</li>
   </ul>
 
   <!-- 14. Online -->
-  <h2 id="Online"><img src="assets/icons/ui_terminal.png" class="icon-h2" alt=""> 14. Сетевой режим совместной работы (WIP)</h2>
+  <h2 id="Online"><img src="assets/icons/menu_online.png" class="icon-h2" alt=""> 14. Online Collaborative Editing (WIP)</h2>
   <p>
-    Совместное редактирование карты несколькими левел-дизайнерами по локальной сети или через релей-сервер с синхронизацией объектов, курсоров и защитой от конфликтов правок.
+    Enables concurrent multi-user level design over standard TCP or relay servers with synchronized edits, teammate cursor frustums, and conflict isolation.
   </p>
 
   <!-- 15. MCP -->
-  <h2 id="MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-h2" alt=""> 15. Интеграция с ИИ через Model Context Protocol (MCP)</h2>
+  <h2 id="MCP"><img src="assets/icons/menu_mcp.png" class="icon-h2" alt=""> 15. Model Context Protocol (MCP) AI Integration</h2>
   <p>
-    Встроенный RPC-сервер MCP на <code>localhost:47823</code>, позволяющий внешним ИИ-ассистентам анализировать сцену, расставлять пропы, проверять освещение и автоматизировать рутинные операции.
+    NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>localhost:47823</code>:
   </p>
+  <ul>
+    <li>Enables external AI coding assistants to inspect map geometry, query entities, sculpt displacements, place props, and execute automated quality assurance passes directly via standardized RPC tool calls.</li>
+  </ul>
 
   <!-- 16. Comparison -->
-  <h2 id="Comparison"><img src="assets/icons/ui_gauge.png" class="icon-h2" alt=""> 16. Сравнение характеристик с Hammer++</h2>
+  <h2 id="Comparison"><img src="assets/icons/ui_gauge.png" class="icon-h2" alt=""> 16. Hammer++ vs NoDraw Specification</h2>
   <table class="wikitable">
     <thead>
       <tr>
-        <th style="width: 25%;">Характеристика</th>
+        <th style="width: 25%;">Capability</th>
         <th style="width: 37%;">Hammer++</th>
         <th style="width: 38%;">NoDraw</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><b>Ядро и язык</b></td>
-        <td class="old-cell">MFC / C++ 2003 (32-бит, вылеты по памяти)</td>
-        <td class="win-cell">Rust + WebGPU (64-бит, безопасность памяти)</td>
+        <td><b>Architecture &amp; Core</b></td>
+        <td class="old-cell">MFC / C++ 2003 (32-bit legacy constraints)</td>
+        <td class="win-cell">Rust + WebGPU (64-bit memory-safe architecture)</td>
       </tr>
       <tr>
-        <td><b>Выделение силуэта пропов</b></td>
-        <td class="old-cell">1-пиксельная ступенчатая маска</td>
-        <td class="win-cell">12-точечный радиальный Subpixel Anti-Aliasing</td>
+        <td><b>Prop Silhouette Selection</b></td>
+        <td class="old-cell">1-pixel aliased binary mask</td>
+        <td class="win-cell">12-tap Subpixel Anti-Aliased Stencil Outline</td>
       </tr>
       <tr>
-        <td><b>Коллизии моделей .PHY</b></td>
-        <td class="old-cell">Паутина диагоналей на плоских гранях</td>
-        <td class="win-cell">Интеллектуальная фильтрация копланарных рёбер</td>
+        <td><b>Physics (.PHY) Display</b></td>
+        <td class="old-cell">Obscures model with dense internal wireframes</td>
+        <td class="win-cell">Coplanar edge filter (clean geometric hulls)</td>
       </tr>
       <tr>
-        <td><b>Превью освещения</b></td>
-        <td class="old-cell">Упрощённое OpenGL / ожидание VRAD</td>
-        <td class="win-cell">162-лучевой Halton превью в реальном времени</td>
+        <td><b>Lighting Preview</b></td>
+        <td class="old-cell">Basic OpenGL approximation / VRAD wait</td>
+        <td class="win-cell">162-ray Halton Lightbake in real-time</td>
       </tr>
       <tr>
-        <td><b>Упаковка в BSP (Pack)</b></td>
-        <td class="old-cell">Требуется сторонний VIDE / Pakrat</td>
-        <td class="win-cell">Встроенный Lump 40 пакер в один клик</td>
+        <td><b>Packfile Compilation</b></td>
+        <td class="old-cell">Requires external VIDE / bspzip tools</td>
+        <td class="win-cell">Built-in Lump 40 injection in one step</td>
       </tr>
       <tr>
-        <td><b>Осмотр карты</b></td>
-        <td class="old-cell">Только полный запуск игры через F9</td>
-        <td class="win-cell">Мгновенный Playtest F6 с noclip прямо в окне</td>
+        <td><b>Instant Walkthrough</b></td>
+        <td class="old-cell">Requires full BSP compilation (F9)</td>
+        <td class="win-cell">Instant F6 Playtest with noclip and player physics</td>
       </tr>
       <tr>
-        <td><b>Моделирование ландшафта</b></td>
-        <td class="old-cell">Деструктивная правка вертексов</td>
-        <td class="win-cell">Неразрушающий стек модификаторов и Auto-Sew</td>
+        <td><b>Terrain Modification</b></td>
+        <td class="old-cell">Standard destructive displacement vertex edits</td>
+        <td class="win-cell">Non-destructive modifier stack &amp; Auto-Sewing</td>
       </tr>
       <tr>
-        <td><b>ИИ / Автоматизация</b></td>
-        <td class="old-cell">Отсутствует (закрытый бинарник)</td>
-        <td class="win-cell">Встроенный сервер Model Context Protocol (MCP)</td>
+        <td><b>AI / Scripting Protocol</b></td>
+        <td class="old-cell">None (closed binary)</td>
+        <td class="win-cell">Embedded MCP Server (Model Context Protocol)</td>
       </tr>
     </tbody>
   </table>
 
   <!-- 17. Hotkeys -->
-  <h2 id="Hotkeys"><img src="assets/icons/ui_terminal.png" class="icon-h2" alt=""> 17. Горячие клавиши NoDraw</h2>
+  <h2 id="Hotkeys"><img src="assets/icons/ui_terminal.png" class="icon-h2" alt=""> 17. Keyboard Shortcuts</h2>
   <table class="wikitable" style="max-width: 650px;">
     <thead>
       <tr>
-        <th style="width: 200px;">Сочетание клавиш</th>
-        <th>Действие в редакторе</th>
+        <th style="width: 200px;">Shortcut</th>
+        <th>Editor Action</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><span class="keyboard-key">F6</span></td>
-        <td>Включение / выключение режима Playtest</td>
+        <td>Toggle real-time in-editor Playtest mode</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">V</span> / <span class="keyboard-key">N</span></td>
-        <td>Переключение Noclip-полёта во время Playtest</td>
+        <td>Toggle Noclip flight mode during Playtest</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">Alt</span> + <span class="keyboard-key">G</span></td>
-        <td>Переход по координатам (поддержка строк <code>setpos / setang</code>)</td>
+        <td>Go to Coordinates (supports console <code>setpos / setang</code> strings)</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">G</span></td>
-        <td>Группировка выбранных объектов</td>
+        <td>Group selected objects</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">U</span></td>
-        <td>Разгруппировка выбранной группы</td>
+        <td>Ungroup selected group</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Alt</span> + <span class="keyboard-key">S</span></td>
-        <td>Режим правки 3D-скайбокса на месте (1:1 масштаб)</td>
+        <td>In-context 3D Skybox editing (isolates skybox at 1:1 scale)</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Esc</span></td>
-        <td>Экстренная остановка фоновой компиляции карты</td>
+        <td>Immediately cancel active background compilation processes</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span></td>
-        <td>Открыть файл карты (.vmf / .bsp)</td>
+        <td>Open map file (<code>.vmf</code> / <code>.bsp</code>)</td>
       </tr>
       <tr>
         <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">S</span></td>
-        <td>Сохранить карту</td>
+        <td>Save active map document</td>
       </tr>
     </tbody>
   </table>
 
   <!-- 18. Download -->
-  <h2 id="Download"><img src="assets/icons/ui_gauge.png" class="icon-h2" alt=""> 18. Установка и пакет для тестеров</h2>
+  <h2 id="Download"><img src="assets/icons/ui_gauge.png" class="icon-h2" alt=""> 18. Download &amp; Installation</h2>
   <p>
-    NoDraw поставляется в виде готового автономного ZIP-пакета. Редактор не требует прав администратора и готов к запуску сразу после распаковки.
+    NoDraw is distributed as an independent, portable ZIP package for authorized beta testers:
   </p>
 
   <table class="wikitable" style="max-width: 650px;">
     <tr>
-      <th colspan="2">Характеристики тестерского архива</th>
+      <th colspan="2">Distribution Package Specifications</th>
     </tr>
     <tr>
-      <td><b>Имя архива</b></td>
+      <td><b>Archive Name</b></td>
       <td><code>nodraw-beta-tester.zip</code></td>
     </tr>
     <tr>
-      <td><b>Размер файла</b></td>
-      <td>17.5 МБ (ZIP, максимальное сжатие)</td>
+      <td><b>File Size</b></td>
+      <td>17.5 MB (Compressed ZIP)</td>
     </tr>
     <tr>
-      <td><b>Дата сборки</b></td>
-      <td>03.11.2026</td>
+      <td><b>Build Date</b></td>
+      <td>2026-11-03</td>
     </tr>
     <tr>
-      <td><b>Состав пакета</b></td>
-      <td><code>NoDraw.exe</code> (Release x64), папка <code>icons/</code> (1154 иконки), <code>plugins/</code> (light_shader), <code>README.txt</code></td>
+      <td><b>Package Contents</b></td>
+      <td><code>NoDraw.exe</code> (Release x64), <code>icons/</code> (1154 items), <code>plugins/</code> (light_shader), <code>README.txt</code></td>
     </tr>
     <tr>
-      <td><b>Ссылка на загрузку</b></td>
-      <td><a href="downloads/nodraw-beta-tester.zip" class="btn-download-head" style="display:inline-flex;margin:0;padding:5px 14px;" download><img src="assets/icons/ui_gauge.png" class="icon-tool" alt=""> Скачать NoDraw Beta</a></td>
+      <td><b>Direct Download</b></td>
+      <td><a href="downloads/nodraw-beta-tester.zip" class="btn-download-head" style="display:inline-flex;padding:5px 14px;margin:0;" download><img src="assets/icons/ui_gauge.png" class="icon-tool" alt=""> Download NoDraw Beta (.ZIP)</a></td>
     </tr>
   </table>
 
-  <h3>Инструкция по быстрому запуску:</h3>
+  <h3>Quickstart Setup</h3>
   <ol>
-    <li>Скачайте архив <code>nodraw-beta-tester.zip</code> и распакуйте в любую папку (например, <code>D:\NoDraw\</code>).</li>
-    <li>Убедитесь, что папка <code>icons/</code> находится рядом с <code>NoDraw.exe</code>.</li>
-    <li>Запустите <b><code>NoDraw.exe</code></b>. Установка не требуется.</li>
-    <li>Редактор автоматически обнаружит установленный Garry's Mod и библиотеки Steam. Если игра находится в нестандартной папке, выберите её через <b>Settings → Game Folder</b>.</li>
-    <li>Откройте карту через <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span> или перетащите <code>.vmf</code> файл в окно программы.</li>
+    <li>Extract <code>nodraw-beta-tester.zip</code> into any local directory (e.g. <code>D:\NoDraw</code>).</li>
+    <li>Verify that the <code>icons/</code> and <code>plugins/</code> folders reside alongside <code>NoDraw.exe</code>.</li>
+    <li>Launch <b><code>NoDraw.exe</code></b>. No installation or administrative elevation required.</li>
+    <li>NoDraw automatically searches Steam registry paths and <code>libraryfolders.vdf</code> to link Garry's Mod content. For custom folder setups, configure via <b>Settings → Game Folder</b>.</li>
+    <li>Open a map by pressing <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span> or dragging a <code>.vmf</code> file directly into the application window.</li>
   </ol>
 
   <!-- Categories -->
   <div id="catlinks">
-    <span>Категории:</span>
+    <span>Categories:</span>
     <ul>
-      <li><a href="#">Level Design</a></li>
-      <li><a href="#">Source Engine Editors</a></li>
-      <li><a href="#">Hammer++ Successors</a></li>
-      <li><a href="#">Garry's Mod Mapping</a></li>
-      <li><a href="#">Rust Applications</a></li>
-      <li><a href="#">WebGPU Tooling</a></li>
+      <li><a href="#Overview">Level Design</a></li>
+      <li><a href="#Overview">Source SDK Tools</a></li>
+      <li><a href="#Overview">Hammer Editors</a></li>
+      <li><a href="#Overview">Garry's Mod Mapping</a></li>
+      <li><a href="#Overview">Rust Applications</a></li>
+      <li><a href="#Overview">WebGPU Tooling</a></li>
     </ul>
   </div>
 
   <footer id="footer">
-    <p>NoDraw Level Editor · Документация для сообщества левел-дизайна Source Engine.</p>
+    <p>NoDraw Level Editor · Next-Generation Source Engine Level Design Environment.</p>
   </footer>
 </main>
 
 <!-- Modal Lightbox -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
-  <img id="modalImg" src="" alt="Enlarged View">
+  <img id="modalImg" src="" alt="Enlarged Preview">
 </div>
 
 <script>
@@ -1079,10 +1103,10 @@
     const toggle = document.querySelector('.toc-toggle');
     if (list.style.display === 'none') {
       list.style.display = 'block';
-      toggle.textContent = '[скрыть]';
+      toggle.textContent = '[hide]';
     } else {
       list.style.display = 'none';
-      toggle.textContent = '[показать]';
+      toggle.textContent = '[show]';
     }
   }
 
