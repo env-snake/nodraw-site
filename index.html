@@ -910,14 +910,66 @@
     Enables concurrent multi-user level design over standard TCP or relay servers with synchronized edits, teammate cursor frustums, and conflict isolation.
   </p>
 
-  <!-- 15. MCP -->
-  <h2 id="MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-h2" alt=""> 15. <span class="i18n" data-en="Model Context Protocol (MCP) AI Integration" data-ru="РРЅС‚РµРіСЂР°С†РёСЏ СЃ РР С‡РµСЂРµР· Model Context Protocol (MCP)">Model Context Protocol (MCP) AI Integration</span></h2>
-  <p class="i18n" data-en="NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>localhost:47823</code>:" data-ru="Р’СЃС‚СЂРѕРµРЅРЅС‹Р№ RPC-СЃРµСЂРІРµСЂ MCP РЅР° <code>localhost:47823</code>, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РІРЅРµС€РЅРёРј РР-Р°СЃСЃРёСЃС‚РµРЅС‚Р°Рј Р°РЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ СЃС†РµРЅСѓ, СЂР°СЃСЃС‚Р°РІР»СЏС‚СЊ РїСЂРѕРїС‹, РїСЂРѕРІРµСЂСЏС‚СЊ РѕСЃРІРµС‰РµРЅРёРµ Рё Р°РІС‚РѕРјР°С‚РёР·РёСЂРѕРІР°С‚СЊ СЂСѓС‚РёРЅРЅС‹Рµ РѕРїРµСЂР°С†РёРё.">
-    NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>localhost:47823</code>:
+    <!-- 15. MCP -->
+  <h2 id="MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-h2" alt=""> 15. <span class="i18n" data-en="Model Context Protocol (MCP) AI Integration" data-ru="Интеграция с ИИ через Model Context Protocol (MCP)">Model Context Protocol (MCP) AI Integration</span></h2>
+  <p class="i18n" data-en="NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>http://127.0.0.1:47823/mcp</code>. This interface allows AI coding assistants (such as Claude Code, Cursor, Windsurf, or custom automation scripts) to inspect, construct, sculpt, and compile maps in real time on the active document." data-ru="В NoDraw встроен официальный сервер Model Context Protocol (MCP), работающий по адресу <code>http://127.0.0.1:47823/mcp</code>. Этот интерфейс позволяет ИИ-ассистентам (Claude Code, Cursor, Windsurf или скриптам) исследовать сцену, возводить геометрию, лепить террейн и компилировать карты в реальном времени.">
+    NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>http://127.0.0.1:47823/mcp</code>. This interface allows AI coding assistants (such as Claude Code, Cursor, Windsurf, or custom automation scripts) to inspect, construct, sculpt, and compile maps in real time on the active document.
   </p>
-  <ul>
-    <li><span class="i18n" data-en="Enables external AI coding assistants to inspect map geometry, query entities, sculpt displacements, place props, and execute automated quality assurance passes directly via standardized RPC tool calls." data-ru="РџРѕР·РІРѕР»СЏРµС‚ РІРЅРµС€РЅРёРј РР-Р°СЃСЃРёСЃС‚РµРЅС‚Р°Рј РёСЃСЃР»РµРґРѕРІР°С‚СЊ РіРµРѕРјРµС‚СЂРёСЋ, СЂР°СЃСЃС‚Р°РІР»СЏС‚СЊ РїСЂРѕРїС‹, РїСЂРѕРІРµСЂСЏС‚СЊ СЃРІРµС‚ Рё РІС‹РїРѕР»РЅСЏС‚СЊ Р°РІС‚РѕРјР°С‚РёР·РёСЂРѕРІР°РЅРЅС‹Рµ QA-РїСЂРѕРІРµСЂРєРё С‡РµСЂРµР· СЃС‚Р°РЅРґР°СЂС‚РёР·РёСЂРѕРІР°РЅРЅС‹Рµ RPC-РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹.">Enables external AI coding assistants to inspect map geometry, query entities, sculpt displacements, place props, and execute automated quality assurance passes directly via standardized RPC tool calls.</span></li>
-  </ul>
+
+  <div class="callout-box callout-important">
+    <b class="i18n" data-en="Connection Command for Claude Code:" data-ru="Команда подключения для Claude Code:">Connection Command for Claude Code:</b><br>
+    <code>claude mcp add --transport http nodraw http://127.0.0.1:47823/mcp</code>
+  </div>
+
+  <p class="i18n" data-en="Every operation executed by the AI agent is recorded as a single atomic undo step (Ctrl+Z). The user camera smoothly flies to where the agent is working, making the construction process visible as it happens." data-ru="Каждая операция ИИ-агента фиксируется как отдельный атомарный шаг отмены (Ctrl+Z). Камера пользователя плавно летит за действиями агента, позволяя наблюдать за процессом строительства вживую.">
+    Every operation executed by the AI agent is recorded as a single atomic undo step (Ctrl+Z). The user camera smoothly flies to where the agent is working, making the construction process visible as it happens.
+  </p>
+
+  <table class="wikitable">
+    <thead>
+      <tr>
+        <th style="width: 25%;" class="i18n" data-en="Tool Group" data-ru="Группа инструментов">Tool Group</th>
+        <th style="width: 35%;" class="i18n" data-en="MCP Tool Calls" data-ru="Вызовы инструментов">MCP Tool Calls</th>
+        <th style="width: 40%;" class="i18n" data-en="Capability" data-ru="Возможности">Capability</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b class="i18n" data-en="Inspection" data-ru="Инспекция карты">Inspection</b></td>
+        <td><code>map_info</code>, <code>list_objects</code>, <code>selection</code>, <code>ground</code></td>
+        <td class="i18n" data-en="Retrieve map boundaries, query geometry, probe terrain elevation, and inspect player selection." data-ru="Сводка карты, поиск объектов в рамке, замер высоты и угла наклона земли.">Retrieve map boundaries, query geometry, probe terrain elevation, and inspect player selection.</td>
+      </tr>
+      <tr>
+        <td><b class="i18n" data-en="Solids &amp; Brushes" data-ru="Браши и тела">Solids &amp; Brushes</b></td>
+        <td><code>create_block</code>, <code>create_primitive</code>, <code>carve</code>, <code>hollow</code>, <code>clip</code>, <code>mesh</code></td>
+        <td class="i18n" data-en="Build graybox structures, parametric primitives (wedges, arches, spiral stairs), boolean carves, extrude/inset faces." data-ru="Грейбокс, примитивы (клинья, арки, винтовые лестницы), вычитание клиньями, выдавливание граней.">Build graybox structures, parametric primitives (wedges, arches, spiral stairs), boolean carves, extrude/inset faces.</td>
+      </tr>
+      <tr>
+        <td><b class="i18n" data-en="Displacements" data-ru="Дисплейсменты">Displacements</b></td>
+        <td><code>create_terrain</code>, <code>sculpt</code>, <code>modify</code>, <code>stack</code>, <code>sew</code>, <code>blend_by_slope</code></td>
+        <td class="i18n" data-en="Generate terrain grids, brush sculpt, procedural modifier stack (Noise, Erosion, Terrace), auto-weld seams." data-ru="Сетки террейна, скульптинг кистями, стек модификаторов (шум, эрозия, террасы), авто-сшив швов.">Generate terrain grids, brush sculpt, procedural modifier stack (Noise, Erosion, Terrace), auto-weld seams.</td>
+      </tr>
+      <tr>
+        <td><b class="i18n" data-en="Splines &amp; Paths" data-ru="Сплайны и пути">Splines &amp; Paths</b></td>
+        <td><code>path</code> (modes: road, channel, strip, wall, brushes, props)</td>
+        <td class="i18n" data-en="Sweep roads, rivers, retaining walls, tunnels, and distribute props along Bezier curves." data-ru="Прорезание дорог, русел рек, создание стен, тоннелей и расстановка пропов вдоль кривых Безье.">Sweep roads, rivers, retaining walls, tunnels, and distribute props along Bezier curves.</td>
+      </tr>
+      <tr>
+        <td><b class="i18n" data-en="Entities &amp; Logic" data-ru="Энтити и логика">Entities &amp; Logic</b></td>
+        <td><code>create_entity</code>, <code>connections</code>, <code>set_keys</code>, <code>sprinkle</code>, <code>propper</code></td>
+        <td class="i18n" data-en="Spawn FGD entities, connect Input/Output logic, scatter foliage/rocks, merge brushes into props." data-ru="Спавн энтити по FGD, настройка связей I/O, процедурное рассеивание пропов, сборка в prop_static.">Spawn FGD entities, connect Input/Output logic, scatter foliage/rocks, merge brushes into props.</td>
+      </tr>
+      <tr>
+        <td><b class="i18n" data-en="Render &amp; Check" data-ru="Рендер и проверка">Render &amp; Check</b></td>
+        <td><code>view</code>, <code>snapshot</code>, <code>camera</code>, <code>compile</code></td>
+        <td class="i18n" data-en="Evaluate real-time lighting, capture validation PNG screenshots, fly camera, run background BSP compiles." data-ru="Превью света, контрольные снимки PNG, управление камерой, запуск компиляции с отслеживанием утечек.">Evaluate real-time lighting, capture validation PNG screenshots, fly camera, run background BSP compiles.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="i18n" data-en="Detailed instructions, coordinate guidelines, and prompt templates are included in the downloadable distribution as <code>MCP_AI_GUIDE.txt</code>." data-ru="Подробные инструкции, спецификация единиц измерения Source Engine и шаблоны промптов включены в тестерский архив в файле <code>MCP_AI_GUIDE.txt</code>.">
+    Detailed instructions, coordinate guidelines, and prompt templates are included in the downloadable distribution as <code>MCP_AI_GUIDE.txt</code>.
+  </p>
 
   <!-- 16. Comparison -->
   <h2 id="Comparison"><img src="assets/icons/select_tool_icon.png" class="icon-h2" alt=""> 16. <span class="i18n" data-en="Hammer++ vs NoDraw Specification" data-ru="РЎСЂР°РІРЅРµРЅРёРµ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє СЃ Hammer++">Hammer++ vs NoDraw Specification</span></h2>
