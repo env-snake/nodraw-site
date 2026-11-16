@@ -1,1325 +1,167 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NoDraw - Level Editor Documentation</title>
-<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-<meta name="description" content="NoDraw - Next-gen Level Editor for Source Engine and Garry's Mod built in Rust with WebGPU.">
-
-<style>
-  /* ==========================================================================
-     Strict Neutral Dark Palette (Zero Blue, Zero Violet - Pure Grayscale R=G=B)
-     ========================================================================== */
-  :root {
-    --nd-bg-page: #101010;
-    --nd-bg-header: #161616;
-    --nd-bg-sidebar: #141414;
-    --nd-bg-content: #121212;
-    --nd-bg-card: #1a1a1a;
-    --nd-bg-hover: #222222;
-    
-    --nd-border: #282828;
-    --nd-border-subtle: #1e1e1e;
-    --nd-border-heading: #303030;
-    
-    --nd-text-bright: #ffffff;
-    --nd-text: #e0e0e0;
-    --nd-text-muted: #9e9e9e;
-    --nd-text-dim: #6c6c6c;
-    
-    --nd-gold: #f5c518;
-    --nd-gold-hover: #ffd54f;
-    --nd-gold-soft: rgba(245, 197, 24, 0.12);
-    --nd-gold-border: rgba(245, 197, 24, 0.35);
-    
-    --nd-code-bg: #151515;
-    --nd-code-border: #262626;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background-color: var(--nd-bg-page);
-    color: var(--nd-text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 13.5px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-
-  a { color: var(--nd-gold); text-decoration: none; transition: color 0.15s; }
-  a:hover { color: var(--nd-gold-hover); text-decoration: underline; }
-
-  /* Custom Slim Scrollbars */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--nd-bg-page); }
-  ::-webkit-scrollbar-thumb { background: #303030; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--nd-gold); }
-
-  /* Top Fixed Header */
-  #top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 52px;
-    background: var(--nd-bg-header);
-    border-bottom: 1px solid var(--nd-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    z-index: 100;
-  }
-
-  .brand-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-  }
-  .brand-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    border: 1px solid var(--nd-border);
-  }
-  .brand-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.01em;
-    line-height: 1.1;
-  }
-  .brand-sub {
-    font-size: 9.5px;
-    color: var(--nd-text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  /* Interactive Language Toggle Button (ENG / RU) */
-  .lang-switcher {
-    display: inline-flex;
-    background: #0e0e0e;
-    border: 1px solid #333333;
-    border-radius: 4px;
-    padding: 2px;
-  }
-  .lang-btn {
-    background: transparent;
-    border: none;
-    color: var(--nd-text-dim);
-    font-family: Consolas, monospace;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .lang-btn.active {
-    background: var(--nd-gold);
-    color: #0e0e0e;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-  }
-  .lang-btn:hover:not(.active) {
-    color: #ffffff;
-  }
-
-  /* Steam-style Gold Gradient Action Button */
-  .btn-steam-gold {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(180deg, #fad02c 0%, #e2a20b 50%, #b88204 100%);
-    border: 1px solid #855f05;
-    border-radius: 4px;
-    padding: 7px 16px;
-    color: #111111 !important;
-    font-weight: 800;
-    font-size: 12.5px;
-    letter-spacing: 0.02em;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.6);
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .btn-steam-gold:hover {
-    background: linear-gradient(180deg, #ffe054 0%, #f0b51a 50%, #cc9005 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 3px 12px rgba(245, 197, 24, 0.35);
-    transform: translateY(-1px);
-    text-decoration: none;
-  }
-  .btn-steam-gold:active {
-    background: linear-gradient(180deg, #d49504 0%, #b88204 100%);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-    transform: translateY(1px);
-  }
-  .btn-steam-gold .ico {
-    width: 15px;
-    height: 15px;
-    object-fit: contain;
-  }
-
-  /* Left Sidebar Navigation */
-  #sidebar {
-    position: fixed;
-    top: 52px;
-    left: 0;
-    bottom: 0;
-    width: 250px;
-    background: var(--nd-bg-sidebar);
-    border-right: 1px solid var(--nd-border);
-    padding: 16px 12px 40px 12px;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .nav-group {
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--nd-border-subtle);
-  }
-  .nav-group:last-child {
-    border-bottom: none;
-  }
-  .nav-header {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--nd-text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    margin-bottom: 6px;
-    padding: 2px 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .nav-list li {
-    margin: 1px 0;
-  }
-  .nav-list a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--nd-text-muted);
-    font-size: 12.5px;
-    padding: 5px 8px;
-    border-radius: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background 0.15s, color 0.15s;
-  }
-  .nav-list a:hover {
-    background: var(--nd-bg-hover);
-    color: var(--nd-text-bright);
-    text-decoration: none;
-  }
-  .nav-list a.active {
-    background: var(--nd-gold-soft);
-    color: var(--nd-gold);
-    font-weight: 600;
-  }
-
-  .icon-tool {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
-  /* Main Content Layout */
-  #main-content {
-    margin-left: 250px;
-    margin-top: 52px;
-    background: var(--nd-bg-content);
-    padding: 28px 44px 80px 44px;
-    min-height: calc(100vh - 52px);
-  }
-
-  .doc-crumb {
-    font-size: 11px;
-    color: var(--nd-text-dim);
-    margin-bottom: 12px;
-  }
-
-  h1.page-title {
-    font-size: 27px;
-    font-weight: 700;
-    color: var(--nd-text-bright);
-    margin: 0 0 4px 0;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--nd-border-heading);
-    letter-spacing: -0.01em;
-  }
-  .page-subtitle {
-    font-size: 11.5px;
-    color: var(--nd-text-dim);
-    margin-bottom: 20px;
-  }
-
-  h2 {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--nd-text-bright);
-    border-bottom: 1px solid var(--nd-border-heading);
-    margin: 34px 0 14px 0;
-    padding-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  h2 .icon-h2 {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-  }
-
-  h3 {
-    font-size: 14.5px;
-    font-weight: 600;
-    color: var(--nd-gold);
-    margin: 20px 0 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  p { margin: 0 0 12px 0; color: var(--nd-text); }
-  ul, ol { margin: 0 0 14px 22px; color: var(--nd-text); }
-  li { margin-bottom: 5px; }
-
-  /* Infobox Card (Clean Logo at top) */
-  .infobox-card {
-    float: right;
-    clear: right;
-    width: 300px;
-    margin: 0 0 18px 24px;
-    background: var(--nd-bg-card);
-    border: 1px solid var(--nd-border);
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-  }
-  .infobox-head {
-    background: var(--nd-bg-header);
-    border-bottom: 2px solid var(--nd-gold);
-    padding: 10px 14px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 14px;
-    color: #ffffff;
-  }
-  .infobox-sub {
-    background: #0e0e0e;
-    padding: 4px 10px;
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--nd-text-dim);
-    border-bottom: 1px solid var(--nd-border);
-  }
-  .infobox-logo-wrap {
-    background: #0b0b0b;
-    padding: 22px 14px;
-    text-align: center;
-    border-bottom: 1px solid var(--nd-border);
-  }
-  .infobox-logo-wrap img {
-    width: 96px;
-    height: 96px;
-    display: inline-block;
-    border-radius: 12px;
-    box-shadow: 0 0 24px rgba(0,0,0,0.8);
-  }
-  .infobox-grid {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11.5px;
-  }
-  .infobox-grid th, .infobox-grid td {
-    padding: 7px 10px;
-    border-bottom: 1px solid var(--nd-border-subtle);
-  }
-  .infobox-grid th {
-    text-align: left;
-    width: 38%;
-    color: var(--nd-text-muted);
-    font-weight: 600;
-    background: #151515;
-  }
-  .infobox-grid td {
-    color: var(--nd-text-bright);
-  }
-  .infobox-btn-wrap {
-    padding: 12px;
-    background: #111111;
-    text-align: center;
-  }
-
-  /* Table of Contents */
-  .toc-box {
-    display: inline-block;
-    background: var(--nd-bg-card);
-    border: 1px solid var(--nd-border);
-    border-radius: 3px;
-    padding: 12px 18px;
-    margin: 10px 0 24px 0;
-    min-width: 270px;
-  }
-  .toc-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    font-size: 12px;
-    color: var(--nd-text-bright);
-    margin-bottom: 8px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--nd-border);
-  }
-  .toc-toggle {
-    font-size: 11px;
-    color: var(--nd-gold);
-    cursor: pointer;
-    font-weight: normal;
-  }
-  .toc-list { list-style: none; margin: 0; padding: 0; font-size: 12px; }
-  .toc-list ul { list-style: none; padding-left: 16px; margin: 2px 0; }
-  .toc-list li { margin: 3px 0; }
-  .toc-num { color: var(--nd-gold); margin-right: 6px; font-family: Consolas, monospace; font-size: 11px; }
-
-  /* Callout Boxes */
-  .callout-box {
-    padding: 11px 15px;
-    margin: 14px 0;
-    border-radius: 3px;
-    font-size: 12.5px;
-    line-height: 1.5;
-  }
-  .callout-important {
-    border-left: 3px solid var(--nd-gold);
-    background: rgba(245, 197, 24, 0.06);
-    border-top: 1px solid var(--nd-border);
-    border-right: 1px solid var(--nd-border);
-    border-bottom: 1px solid var(--nd-border);
-    color: #e0e0e0;
-  }
-  .callout-important b { color: var(--nd-gold); }
-
-  /* Tables */
-  .wikitable {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--nd-bg-card);
-    border: 1px solid var(--nd-border);
-    margin: 14px 0;
-    font-size: 12px;
-  }
-  .wikitable th {
-    background: #141414;
-    border: 1px solid var(--nd-border);
-    padding: 8px 10px;
-    color: #ffffff;
-    font-weight: 600;
-    text-align: left;
-  }
-  .wikitable td {
-    border: 1px solid var(--nd-border);
-    padding: 8px 10px;
-    color: var(--nd-text);
-  }
-  .wikitable tr:hover td {
-    background: var(--nd-bg-hover);
-  }
-  .win-cell { color: var(--nd-gold); font-weight: 600; }
-  .old-cell { color: var(--nd-text-dim); }
-
-  /* Keyboard Key Tag */
-  .keyboard-key {
-    display: inline-block;
-    border: 1px solid #444444;
-    box-shadow: 0 2px 0 #1c1c1c;
-    border-radius: 3px;
-    background: #181818;
-    color: #ffffff;
-    margin: 0 2px;
-    padding: 1px 6px;
-    font-family: Consolas, monospace;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  code, kbd {
-    font-family: Consolas, monospace;
-    font-size: 11.5px;
-    color: #f5c518;
-    background: var(--nd-code-bg);
-    border: 1px solid var(--nd-code-border);
-    padding: 1px 4px;
-    border-radius: 2px;
-  }
-
-  /* Definitions & Property list */
-  dl dt {
-    font-weight: 700;
-    color: var(--nd-gold);
-    margin-top: 10px;
-  }
-  dl dd {
-    margin-left: 18px;
-    margin-bottom: 6px;
-    color: var(--nd-text);
-  }
-
-  /* Image showcase */
-  .image-card {
-    background: #0a0a0a;
-    border: 1px solid var(--nd-border);
-    border-radius: 3px;
-    overflow: hidden;
-    margin: 14px 0 20px 0;
-  }
-  .image-card img {
-    width: 100%;
-    display: block;
-    cursor: zoom-in;
-  }
-  .image-caption {
-    padding: 7px 12px;
-    background: var(--nd-bg-card);
-    border-top: 1px solid var(--nd-border);
-    font-size: 11.5px;
-    color: var(--nd-text-muted);
-  }
-
-  /* Category links at bottom */
-  #catlinks {
-    margin-top: 36px;
-    padding: 8px 12px;
-    background: var(--nd-bg-card);
-    border: 1px solid var(--nd-border);
-    border-radius: 3px;
-    font-size: 11.5px;
-    color: var(--nd-text-dim);
-  }
-  #catlinks ul { display: inline; list-style: none; margin: 0; padding: 0; }
-  #catlinks li { display: inline; margin-right: 6px; }
-  #catlinks li::after { content: " |"; color: var(--nd-border); }
-  #catlinks li:last-child::after { content: ""; }
-
-  /* Footer */
-  #footer {
-    margin-top: 26px;
-    padding-top: 14px;
-    border-top: 1px solid var(--nd-border);
-    font-size: 11px;
-    color: var(--nd-text-dim);
-  }
-
-  /* Modal Lightbox */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0,0,0,0.92);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal-overlay img {
-    max-width: 95vw;
-    max-height: 90vh;
-    border: 1px solid #444444;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-  }
-
-  @media (max-width: 900px) {
-    #sidebar { display: none; }
-    #main-content { margin-left: 0; padding: 14px; }
-    .infobox-card { float: none; width: 100%; margin: 14px 0; }
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NoDraw level editor for Source 1 and Garry's Mod. Download the Windows beta and find installation, editing, and compile instructions.">
+  <title>NoDraw Wiki</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="wiki.css">
+  <script defer src="wiki.js"></script>
 </head>
 <body>
-
-<!-- Top Fixed Header -->
-<header id="top-bar">
-  <a class="brand-area" href="#top">
-    <img src="assets/logo.png" alt="NoDraw Logo" class="brand-logo">
-    <div>
-      <div class="brand-title">NoDraw</div>
-      <div class="brand-sub">LEVEL EDITOR DOCUMENTATION</div>
-    </div>
-  </a>
-
-  <div class="header-actions">
-    <!-- Clickable Interactive Language Switcher -->
-    <div class="lang-switcher">
-      <button type="button" class="lang-btn active" id="btn-lang-en" onclick="setLang('en')">ENG</button>
-      <button type="button" class="lang-btn" id="btn-lang-ru" onclick="setLang('ru')">RU</button>
-    </div>
-
-    <!-- Steam-style Golden Gradient Download Button -->
-    <a href="downloads/nodraw-beta-tester.zip" class="btn-steam-gold" download>
-      <img src="assets/icons/control_play.png" class="ico" alt="">
-      <span class="i18n" data-key="Download Beta (.ZIP)">Download Beta (.ZIP)</span>
+  <header class="masthead">
+    <a class="brand" href="#top">
+      <img src="assets/logo.png" alt="" width="37" height="37">
+      <strong>NoDraw</strong>
+      <span data-ru="Документация">Level Editor Wiki</span>
     </a>
-  </div>
-</header>
+  </header>
+  <div class="wiki" id="top">
+    <nav class="navigation" aria-label="Wiki navigation">
+      <p data-ru="NoDraw">NoDraw</p>
+      <ul>
+        <li><a href="#Overview" data-ru="Обзор">Overview</a></li>
+        <li><a href="#Download" data-ru="Скачать и установить">Download and install</a></li>
+        <li><a href="#Interface" data-ru="Инструменты">Editing tools</a></li>
+        <li><a href="#Compile" data-ru="Компиляция">Compiling a map</a></li>
+        <li><a href="#Hotkeys" data-ru="Горячие клавиши">Keyboard shortcuts</a></li>
+      </ul>
+      <p data-ru="Ресурсы">Resources</p>
+      <ul>
+        <li><a href="https://github.com/env-snake/nodraw-site/releases" data-ru="Выпуски">Releases</a></li>
+        <li><a href="https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor">Valve Hammer Editor</a></li>
+        <li><a href="https://wiki.facepunch.com/gmod/">Garry’s Mod Wiki</a></li>
+      </ul>
+    </nav>
+    <main class="article">
+      <div class="article-header">
+        <h1 id="Overview" data-ru="NoDraw (редактор карт Source)">NoDraw (Source Level Editor)</h1>
+        <div class="languages" role="group" aria-label="Language">
+          <button type="button" data-language="en" aria-pressed="true" lang="en">English</button>
+          <button type="button" data-language="ru" aria-pressed="false" lang="ru">Русский</button>
+        </div>
+      </div>
+      <div class="intro">
+        <div class="intro-copy">
+          <p><strong>NoDraw</strong> <span data-ru="— самостоятельный редактор карт Source 1 для Windows. Он поддерживает браши, дисплейсменты, сущности и материалы Garry’s Mod.">is a standalone Source 1 level editor for Windows. It supports brushes, displacements, entities, and Garry’s Mod materials.</span></p>
+          <p data-ru="В редакторе можно открыть VMF, править геометрию и материалы, проверить освещение и собрать BSP. Если ты работал в Hammer, основные форматы и термины уже знакомы.">Open a VMF to edit geometry and materials, preview lighting, and compile a BSP. The core formats and terminology are familiar to Hammer users.</p>
+          <p class="notice"><strong data-ru="Бета-версия.">Beta release.</strong> <span data-ru="Для первых тестов используй копию карты. Об ошибках сообщай с шагами воспроизведения и версией из Help → Welcome.">Use a copy of your map for initial testing. Include reproduction steps and the version from Help → Welcome in bug reports.</span></p>
+          <nav class="contents" aria-labelledby="contents-heading">
+            <p id="contents-heading" data-ru="Содержание">Contents</p>
+            <ol>
+              <li><a href="#Download" data-ru="Установка и запуск">Installing and launching</a></li>
+              <li><a href="#Interface" data-ru="Работа с картой">Editing a map</a></li>
+              <li><a href="#Lighting" data-ru="Свет и 3D-скайбокс">Lighting and 3D sky</a></li>
+              <li><a href="#Compile" data-ru="Сборка и запуск в игре">Compiling and playtesting</a></li>
+              <li><a href="#Hotkeys" data-ru="Горячие клавиши">Keyboard shortcuts</a></li>
+              <li><a href="#MCP" data-ru="Интеграция с MCP">MCP integration</a></li>
+            </ol>
+          </nav>
+        </div>
+        <aside class="infobox" aria-labelledby="infobox-heading">
+          <h2 id="infobox-heading">NoDraw</h2>
+          <figure>
+            <a href="assets/nodraw_ui_main.png" aria-label="Open the full-size NoDraw screenshot">
+              <img src="assets/nodraw_ui_main.png" alt="NoDraw editor showing camera, top, front, and side views" width="1920" height="1050">
+            </a>
+            <figcaption data-ru="Рабочая область NoDraw">NoDraw editor workspace</figcaption>
+          </figure>
+          <dl>
+            <dt data-ru="Версия">Build</dt><dd data-beta-version>—</dd>
+            <dt data-ru="Система">Platform</dt><dd>Windows x64</dd>
+            <dt data-ru="Движок">Engine</dt><dd>Source 1</dd>
+            <dt data-ru="Карты">Maps</dt><dd>VMF, BSP</dd>
+            <dt data-ru="Рендер">Graphics</dt><dd>DirectX 12, Vulkan</dd>
+            <dt data-ru="Разработчик">Developer</dt><dd>env_snake</dd>
+          </dl>
+          <div class="infobox-download">
+            <a class="download-action" href="https://github.com/env-snake/nodraw-site/releases" data-beta-download>
+              <img src="assets/icons/control_play.png" alt="">
+              <span data-ru="Скачать бету">Download beta</span>
+            </a>
+          </div>
+        </aside>
+      </div>
 
-<!-- Left Sidebar Navigation -->
-<aside id="sidebar">
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/select_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="NAVIGATION">NAVIGATION</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#top" class="active"><span class="i18n" data-key="Main Page">Main Page</span></a></li>
-      <li><a href="#Overview"><span class="i18n" data-key="Architecture">Architecture</span></a></li>
-      <li><a href="#Interface"><span class="i18n" data-key="User Interface">User Interface</span></a></li>
-      <li><a href="#Download"><span class="i18n" data-key="Beta Download">Beta Download</span></a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/polygon_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="nav_mesh">MESH &amp; BRUSHES</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#Mesh_Modeling"><img src="assets/icons/clipping_tool_icon.png" class="icon-tool" alt=""> CSG Boolean &amp; Carve</a></li>
-      <li><a href="#Mesh_Modeling"><img src="assets/icons/convex_tool_icon.png" class="icon-tool" alt=""> Extrude, Inset &amp; Bevel</a></li>
-      <li><a href="#Primitives"><img src="assets/icons/block_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="Shapes &amp; Primitives">Shapes &amp; Primitives</span></a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/displacement_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="DISPLACEMENTS">DISPLACEMENTS</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#Displacements"><img src="assets/icons/displacement_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="Sculpt Brushes">Sculpt Brushes</span></a></li>
-      <li><a href="#Displacements"><img src="assets/icons/displacement_flatten_raise.png" class="icon-tool" alt=""> <span class="i18n" data-key="Modifier Stack">Modifier Stack</span></a></li>
-      <li><a href="#Displacements"><img src="assets/icons/seam_sew.png" class="icon-tool" alt=""> <span class="i18n" data-key="Auto-Sew Seams">Auto-Sew Seams</span></a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/path_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="SPLINES &amp; PATHS">SPLINES &amp; PATHS</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#Paths"><img src="assets/icons/path_tool_icon.png" class="icon-tool" alt=""> Path Tool</a></li>
-      <li><a href="#Paths"><img src="assets/icons/path_ribbon.png" class="icon-tool" alt=""> <span class="i18n" data-key="Roads, Walls &amp; Tunnels">Roads, Walls &amp; Tunnels</span></a></li>
-      <li><a href="#Paths"><img src="assets/icons/asset_spray_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="Prop Distribution">Prop Distribution</span></a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/entity_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="LIGHTING &amp; SHADERS">LIGHTING &amp; SHADERS</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#Lighting"><img src="assets/icons/bake_ambient_tool_icon.png" class="icon-tool" alt=""> Halton 162-ray Lightbake</a></li>
-      <li><a href="#Materials"><img src="assets/icons/material_lg.png" class="icon-tool" alt=""> <span class="i18n" data-key="Materials &amp; UV Lock">Materials &amp; UV Lock</span></a></li>
-      <li><a href="#Shaders"><img src="assets/icons/skybox_2d.png" class="icon-tool" alt=""> <span class="i18n" data-key="Water &amp; 2D Skybox">Water &amp; 2D Skybox</span></a></li>
-      <li><a href="#Selection"><img src="assets/icons/select_tool_icon.png" class="icon-tool" alt=""> Stencil Outline (AA)</a></li>
-    </ul>
-  </div>
-
-  <div class="nav-group">
-    <div class="nav-header">
-      <img src="assets/icons/physics_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="TOOLS &amp; PIPELINE">TOOLS &amp; PIPELINE</span>
-    </div>
-    <ul class="nav-list">
-      <li><a href="#Collision"><img src="assets/icons/physics_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key=".PHY Collision Parser">.PHY Collision Parser</span></a></li>
-      <li><a href="#Logic"><img src="assets/icons/entity_tool_icon.png" class="icon-tool" alt=""> <span class="i18n" data-key="Entity I/O Connections">Entity I/O Connections</span></a></li>
-      <li><a href="#Automation"><img src="assets/icons/ui_rocket_launch.png" class="icon-tool" alt=""> Lump 40 Packfile</a></li>
-      <li><a href="#Automation"><img src="assets/icons/polygon_tool_icon.png" class="icon-tool" alt=""> Propper StudioMDL</a></li>
-      <li><a href="#Playtest"><img src="assets/icons/control_play.png" class="icon-tool" alt=""> Playtest (F6) Mode</a></li>
-      <li><a href="#Online"><img src="assets/icons/coordinate_frame_world.png" class="icon-tool" alt=""> Online Co-Edit (WIP)</a></li>
-      <li><a href="#MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-tool" alt=""> MCP AI Integration</a></li>
-    </ul>
-  </div>
-</aside>
-
-<!-- Main Documentation Content -->
-<main id="main-content">
-  <h1 class="page-title">NoDraw</h1>
-  <div class="page-subtitle i18n" data-key="header_subtitle">
-    Next-Generation Source Engine Level Editor - Technical Documentation &amp; Manual
-  </div>
-
-  <!-- Right Infobox Card (Logo Only at Top) -->
-  <aside class="infobox-card">
-    <div class="infobox-head">NoDraw Level Editor</div>
-    <!-- Subtitle: "Source & Garry's Mod Mapping Environment" (without "1") -->
-    <div class="infobox-sub i18n" data-key="Source &amp; Garry's Mod Mapping Environment">
-      Source &amp; Garry's Mod Mapping Environment
-    </div>
-    <div class="infobox-logo-wrap">
-      <img src="assets/logo.png" alt="NoDraw Official Logo">
-    </div>
-    <table class="infobox-grid">
-      <tr>
-        <th class="i18n" data-key="Developer">Developer</th>
-        <td>env_snake</td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Current Build">Current Build</th>
-        <td><code>0.1.0-beta</code> (2026-11-03)</td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Architecture">Architecture</th>
-        <td>Rust + WebGPU (64-bit native)</td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Render Backend">Render Backend</th>
-        <td>Vulkan, DirectX 12</td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Target Engines">Target Engines</th>
-        <td>Source Engine, Garry's Mod</td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Map Formats">Map Formats</th>
-        <td><code>.vmf</code>, <code>.bsp</code>, <code>.vmx</code></td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Model Formats">Model Formats</th>
-        <td><code>.mdl</code>, <code>.vvd</code>, <code>.vtx</code>, <code>.phy</code></td>
-      </tr>
-      <tr>
-        <th class="i18n" data-key="Distribution">Distribution</th>
-        <td class="i18n" data-key="Closed Beta (Portable)">Closed Beta (Portable)</td>
-      </tr>
-    </table>
-    <div class="infobox-btn-wrap">
-      <a href="downloads/nodraw-beta-tester.zip" class="btn-steam-gold" style="width:100%;" download>
-        <img src="assets/icons/control_play.png" class="ico" alt="">
-        <span class="i18n" data-key="Download Closed Beta (17.5 MB)">Download Closed Beta (17.5 MB)</span>
-      </a>
-    </div>
-  </aside>
-
-  <!-- Lead Paragraph -->
-  <p class="i18n" data-key="<b>NoDraw</b> is a high-performance, 64-bit standalone level editor for the <b>Source Engine</b> and <b>Garry's Mod</b>, engineered from the ground up in <b>Rust</b> on top of <b>WebGPU (wgpu)</b>.">
-    <b>NoDraw</b> is a high-performance, 64-bit standalone level editor for the <b>Source Engine</b> and <b>Garry's Mod</b>, engineered from the ground up in <b>Rust</b> on top of <b>WebGPU (wgpu)</b>.
-  </p>
-  <p class="i18n" data-key="Designed as the direct successor to <b>Hammer++</b> and Valve's legacy Hammer Editor, NoDraw removes decades of 32-bit MFC legacy constraints from 1998. It eliminates out-of-memory crashes on dense scenes and introduces modern level design workflows: real-time physical lighting previews, subpixel anti-aliased stencil outlines, precise Havok physics collision visualization, procedural displacement modifier stacks, and built-in BSP lump packing.">
-    Designed as the direct successor to <b>Hammer++</b> and Valve's legacy Hammer Editor, NoDraw removes decades of 32-bit MFC legacy constraints from 1998. It eliminates out-of-memory crashes on dense scenes and introduces modern level design workflows: real-time physical lighting previews, subpixel anti-aliased stencil outlines, precise Havok physics collision visualization, procedural displacement modifier stacks, and built-in BSP lump packing.
-  </p>
-
-  <div class="callout-box callout-important">
-    <b class="i18n" data-key="Clean Game Integration:">Clean Game Integration:</b> 
-    <span class="i18n" data-key="NoDraw reads directly from official Steam libraries, <code>gameinfo.txt</code> search paths, and <code>mount.cfg</code> mounts. The editor requires no game DLL replacements or engine hooks. All maps saved by NoDraw remain 100% compliant with standard Source SDK compilers (<code>vbsp</code>, <code>vvis</code>, <code>vrad</code>).">NoDraw reads directly from official Steam libraries, <code>gameinfo.txt</code> search paths, and <code>mount.cfg</code> mounts. The editor requires no game DLL replacements or engine hooks. All maps saved by NoDraw remain 100% compliant with standard Source SDK compilers (<code>vbsp</code>, <code>vvis</code>, <code>vrad</code>).</span>
-  </div>
-
-  <!-- Table of Contents -->
-  <div class="toc-box" id="toc">
-    <div class="toc-title-row">
-      <span class="i18n" data-key="Contents">Contents</span>
-      <span class="toc-toggle" onclick="toggleToc()">[hide]</span>
-    </div>
-    <ul class="toc-list" id="toc-list">
-      <li><span class="toc-num">1</span> <a href="#Overview"><span class="i18n" data-key="Overview &amp; Core Architecture">Overview &amp; Core Architecture</span></a></li>
-      <li><span class="toc-num">2</span> <a href="#Interface"><span class="i18n" data-key="Interface &amp; Workspace Layout">Interface &amp; Workspace Layout</span></a></li>
-      <li><span class="toc-num">3</span> <a href="#Mesh_Modeling"><span class="i18n" data-key="Brush &amp; Mesh Modeling (CSG, Carve, Extrude, Bevel)">Brush &amp; Mesh Modeling (CSG, Carve, Extrude, Bevel)</span></a></li>
-      <li><span class="toc-num">4</span> <a href="#Primitives"><span class="i18n" data-key="Shapes &amp; Primitive Generators">Shapes &amp; Primitive Generators</span></a></li>
-      <li><span class="toc-num">5</span> <a href="#Displacements"><span class="i18n" data-key="Displacements &amp; Terrain (Sculpting, Modifier Stack)">Displacements &amp; Terrain (Sculpting, Modifier Stack)</span></a></li>
-      <li><span class="toc-num">6</span> <a href="#Paths"><span class="i18n" data-key="Splines &amp; Path Tool">Splines &amp; Path Tool</span></a></li>
-      <li><span class="toc-num">7</span> <a href="#Lighting"><span class="i18n" data-key="Lighting: 162-ray Halton Lightbake">Lighting: 162-ray Halton Lightbake</span></a></li>
-      <li><span class="toc-num">8</span> <a href="#Materials"><span class="i18n" data-key="Material Editor &amp; Texturing">Material Editor &amp; Texturing</span></a></li>
-      <li><span class="toc-num">9</span> <a href="#Shaders"><span class="i18n" data-key="Engine Shaders (Water Refraction &amp; 2D Skybox)">Engine Shaders (Water Refraction &amp; 2D Skybox)</span></a></li>
-      <li><span class="toc-num">10</span> <a href="#Selection"><span class="i18n" data-key="Selection Stencil &amp; .PHY Collision Pipeline">Selection Stencil &amp; .PHY Collision Pipeline</span></a></li>
-      <li><span class="toc-num">11</span> <a href="#Logic"><span class="i18n" data-key="Entity I/O &amp; Connection Graphs">Entity I/O &amp; Connection Graphs</span></a></li>
-      <li><span class="toc-num">12</span> <a href="#Automation"><span class="i18n" data-key="Automation: Propper, Lump 40 Pack, Sprinkle">Automation: Propper, Lump 40 Pack, Sprinkle</span></a></li>
-      <li><span class="toc-num">13</span> <a href="#Playtest"><span class="i18n" data-key="In-Editor Playtest Mode (F6)">In-Editor Playtest Mode (F6)</span></a></li>
-      <li><span class="toc-num">14</span> <a href="#Online"><span class="i18n" data-key="Online Collaborative Editing (WIP)">Online Collaborative Editing (WIP)</span></a></li>
-      <li><span class="toc-num">15</span> <a href="#MCP"><span class="i18n" data-key="Model Context Protocol (MCP) AI Integration">Model Context Protocol (MCP) AI Integration</span></a></li>
-      <li><span class="toc-num">16</span> <a href="#Comparison"><span class="i18n" data-key="Hammer++ vs NoDraw Specification">Hammer++ vs NoDraw Specification</span></a></li>
-      <li><span class="toc-num">17</span> <a href="#Hotkeys"><span class="i18n" data-key="Keyboard Shortcuts">Keyboard Shortcuts</span></a></li>
-      <li><span class="toc-num">18</span> <a href="#Download"><span class="i18n" data-key="Download &amp; Installation">Download &amp; Installation</span></a></li>
-    </ul>
-  </div>
-
-  <!-- 1. Overview -->
-  <h2 id="Overview"><img src="assets/icons/select_tool_icon.png" class="icon-h2" alt=""> 1. <span class="i18n" data-key="Overview &amp; Core Architecture">Overview &amp; Core Architecture</span></h2>
-  <p class="i18n" data-key="Valve's Hammer Editor was historically bound to 32-bit Windows MFC architectures, limiting memory allocation to 3.2 GB and causing frequent crashes on complex scenes with high polygon and entity counts.">
-    Valve's Hammer Editor was historically bound to 32-bit Windows MFC architectures, limiting memory allocation to 3.2 GB and causing frequent crashes on complex scenes with high polygon and entity counts.
-  </p>
-  <ul>
-    <li><b class="i18n" data-key="Memory Safety (Rust):">Memory Safety (Rust):</b> <span class="i18n" data-key="Guaranteed memory safety through compile-time ownership semantics. Eliminates pointer corruption, buffer overflows, and crashes during vertex manipulation.">Guaranteed memory safety through compile-time ownership semantics. Eliminates pointer corruption, buffer overflows, and crashes during vertex manipulation.</span></li>
-    <li><b class="i18n" data-key="WebGPU Hardware Acceleration:">WebGPU Hardware Acceleration:</b> <span class="i18n" data-key="Low-overhead Vulkan and DirectX 12 command queues deliver a sustained 60+ FPS across hundreds of thousands of brush polygons and dense dynamic prop arrays.">Low-overhead Vulkan and DirectX 12 command queues deliver a sustained 60+ FPS across hundreds of thousands of brush polygons and dense dynamic prop arrays.</span></li>
-    <li><b class="i18n" data-key="Deterministic Undo Transactions:">Deterministic Undo Transactions:</b> <span class="i18n" data-key="Every editor action is recorded in transactional trees, enabling instantaneous undo/redo operations without risk of state drift or file corruption.">Every editor action is recorded in transactional trees, enabling instantaneous undo/redo operations without risk of state drift or file corruption.</span></li>
-  </ul>
-
-  <!-- 2. Interface -->
-  <h2 id="Interface"><img src="assets/icons/select_tool_icon.png" class="icon-h2" alt=""> 2. <span class="i18n" data-key="Interface &amp; Workspace Layout">Interface &amp; Workspace Layout</span></h2>
-  <div class="image-card">
-    <img src="assets/nodraw_ui_main.png" alt="NoDraw 4-Viewport Workspace" onclick="openModal('assets/nodraw_ui_main.png')">
-    <div class="image-caption i18n" data-key="<b>Fig. 1:</b> Four-viewport layout: 3D Shaded Viewport, 2D Top (X/Y), 2D Front (Y/Z), 2D Side (X/Z), Properties Inspector, and Assets Browser.">
-      <b>Fig. 1:</b> Four-viewport layout: 3D Shaded Viewport, 2D Top (X/Y), 2D Front (Y/Z), 2D Side (X/Z), Properties Inspector, and Assets Browser.
-    </div>
-  </div>
-  <ul>
-    <li><b class="i18n" data-key="Left Tool Strip:">Left Tool Strip:</b> <span class="i18n" data-key="Direct access to Selection, Zoom, Camera, Block, Polygon, Mesh, Clip, Displacements, Path Splines, Entities, Decals, Overlays, and Sprinkling.">Direct access to Selection, Zoom, Camera, Block, Polygon, Mesh, Clip, Displacements, Path Splines, Entities, Decals, Overlays, and Sprinkling.</span></li>
-    <li><b class="i18n" data-key="Right Inspector (Tool / Properties / Details):">Right Inspector (Tool / Properties / Details):</b> <span class="i18n" data-key="Deep parameter management for solids, displacements, boolean cutters, snapping grids, and 3D transform gizmos.">Deep parameter management for solids, displacements, boolean cutters, snapping grids, and 3D transform gizmos.</span></li>
-    <li><b class="i18n" data-key="Bottom Assets Explorer:">Bottom Assets Explorer:</b> <span class="i18n" data-key="Instant indexing across thousands of VMT materials, MDL models, sounds, and particles with live search and drag-and-drop texture assignment.">Instant indexing across thousands of VMT materials, MDL models, sounds, and particles with live search and drag-and-drop texture assignment.</span></li>
-  </ul>
-
-  <!-- 3. Mesh Modeling -->
-  <h2 id="Mesh_Modeling"><img src="assets/icons/act_merge.png" class="icon-h2" alt=""> 3. <span class="i18n" data-key="Brush &amp; Mesh Modeling">Brush &amp; Mesh Modeling</span></h2>
-  <dl>
-    <dt class="i18n" data-key="Non-Destructive Boolean CSG">Non-Destructive Boolean CSG</dt>
-    <dd class="i18n" data-key="Supports <code>Union</code>, <code>Difference</code>, and <code>Intersect</code> operations. Cutters remain stored in an editable parameter stack until explicitly baked, allowing adjustments to wall openings and archways without destructive cuts.">Supports <code>Union</code>, <code>Difference</code>, and <code>Intersect</code> operations. Cutters remain stored in an editable parameter stack until explicitly baked, allowing adjustments to wall openings and archways without destructive cuts.</dd>
-    <dt class="i18n" data-key="Smart Carve">Smart Carve</dt>
-    <dd class="i18n" data-key="Replaces Hammer's legacy Carve tool. Carves openings using clean radial wedges around holes, ensuring strictly convex, BSP-compliant brushes without generating degenerate geometry.">Replaces Hammer's legacy Carve tool. Carves openings using clean radial wedges around holes, ensuring strictly convex, BSP-compliant brushes without generating degenerate geometry.</dd>
-    <dt class="i18n" data-key="Mesh Operations: Extrude, Inset &amp; Bevel">Mesh Operations: Extrude, Inset &amp; Bevel</dt>
-    <dd class="i18n" data-key="Direct face manipulation: extrude faces along surface normals or custom directional deltas; inset face perimeters; bevel brush edges with configurable radius and segment subdivisions.">Direct face manipulation: extrude faces along surface normals or custom directional deltas; inset face perimeters; bevel brush edges with configurable radius and segment subdivisions.</dd>
-    <dt class="i18n" data-key="Vertex Editing with UV Lock">Vertex Editing with UV Lock</dt>
-    <dd class="i18n" data-key="Edit vertices and edges in 2D and 3D views while automatically maintaining texture projection axes across untouched faces.">Edit vertices and edges in 2D and 3D views while automatically maintaining texture projection axes across untouched faces.</dd>
-  </dl>
-
-  <!-- 4. Primitives -->
-  <h2 id="Primitives"><img src="assets/icons/block_tool_icon.png" class="icon-h2" alt=""> 4. <span class="i18n" data-key="Shapes &amp; Primitive Generators">Shapes &amp; Primitive Generators</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="Standard Volumes:">Standard Volumes:</b> <span class="i18n" data-key="Parametric boxes, wedges, cylinders, cones, spikes, and geodesic spheres.">Parametric boxes, wedges, cylinders, cones, spikes, and geodesic spheres.</span></li>
-    <li><b class="i18n" data-key="Arches &amp; Toruses:">Arches &amp; Toruses:</b> <span class="i18n" data-key="Configurable inner/outer radii, wall thickness, radial subdivisions, and sweep arcs from 0В° to 360В°.">Configurable inner/outer radii, wall thickness, radial subdivisions, and sweep arcs from 0В° to 360В°.</span></li>
-    <li><b class="i18n" data-key="Staircase Generators:">Staircase Generators:</b> <span class="i18n" data-key="Linear steps along designated axes or parametric <b>Spiral Stairs</b> with customizable turns, step height, and inner radius.">Linear steps along designated axes or parametric <b>Spiral Stairs</b> with customizable turns, step height, and inner radius.</span></li>
-  </ul>
-
-  <!-- 5. Displacements -->
-  <h2 id="Displacements"><img src="assets/icons/displacement_tool_icon.png" class="icon-h2" alt=""> 5. <span class="i18n" data-key="Displacements &amp; Terrain Sculpting">Displacements &amp; Terrain Sculpting</span></h2>
-  <dl>
-    <dt class="i18n" data-key="Interactive Sculpting Brushes">Interactive Sculpting Brushes</dt>
-    <dd class="i18n" data-key="Sculpt displacement surfaces in real time using <code>Raise</code>, <code>Lower</code>, <code>Smooth</code>, <code>Relax</code>, <code>Flatten</code>, <code>Noise</code>, <code>Inflate</code>, and <code>Smudge</code> brushes with smooth radial falloffs.">Sculpt displacement surfaces in real time using <code>Raise</code>, <code>Lower</code>, <code>Smooth</code>, <code>Relax</code>, <code>Flatten</code>, <code>Noise</code>, <code>Inflate</code>, and <code>Smudge</code> brushes with smooth radial falloffs.</dd>
-    <dt class="i18n" data-key="Non-Destructive Modifier Stack">Non-Destructive Modifier Stack</dt>
-    <dd class="i18n" data-key="Stack parametric procedural modifiers evaluated on top of the displacement base: <code>HeightSmooth</code>, <code>SurfaceSmooth</code>, <code>Terrace</code> (stepped landforms), <code>Erosion</code> (hydraulic/gravity simulation), <code>Strata</code> (geological rock layers), <code>Noise</code>, <code>Bend</code>, <code>Twist</code>, and <code>Taper</code>.">Stack parametric procedural modifiers evaluated on top of the displacement base: <code>HeightSmooth</code>, <code>SurfaceSmooth</code>, <code>Terrace</code> (stepped landforms), <code>Erosion</code> (hydraulic/gravity simulation), <code>Strata</code> (geological rock layers), <code>Noise</code>, <code>Bend</code>, <code>Twist</code>, and <code>Taper</code>.</dd>
-    <dt class="i18n" data-key="Auto-Sew Seams &amp; T-Junctions">Auto-Sew Seams &amp; T-Junctions</dt>
-    <dd class="i18n" data-key="Automatic detection and welding of adjacent displacement edges, resolving cracks, tears, and vertex seams between differing power levels.">Automatic detection and welding of adjacent displacement edges, resolving cracks, tears, and vertex seams between differing power levels.</dd>
-    <dt class="i18n" data-key="Slope-Based Alpha Blending">Slope-Based Alpha Blending</dt>
-    <dd class="i18n" data-key="Automatically paints <code>WorldVertexTransition</code> materials according to normal slope: steep cliffs receive rock textures, while flat ground transitions to grass or dirt.">Automatically paints <code>WorldVertexTransition</code> materials according to normal slope: steep cliffs receive rock textures, while flat ground transitions to grass or dirt.</dd>
-  </dl>
-
-  <!-- 6. Paths -->
-  <h2 id="Paths"><img src="assets/icons/path_tool_icon.png" class="icon-h2" alt=""> 6. <span class="i18n" data-key="Splines &amp; Path Tool">Splines &amp; Path Tool</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="Terrain Shaping:">Terrain Shaping:</b> <span class="i18n" data-key="Carve roads, water channels, mountain ridges, and trenches through existing displacements.">Carve roads, water channels, mountain ridges, and trenches through existing displacements.</span></li>
-    <li><b class="i18n" data-key="Profile Sweeping:">Profile Sweeping:</b> <span class="i18n" data-key="Extrude ribbons of geometry along curves to generate road surfaces (<code>strip</code>), cliff walls (<code>wall</code>), curbs, pipes, and tunnels (<code>cut</code>).">Extrude ribbons of geometry along curves to generate road surfaces (<code>strip</code>), cliff walls (<code>wall</code>), curbs, pipes, and tunnels (<code>cut</code>).</span></li>
-    <li><b class="i18n" data-key="Prop Distribution:">Prop Distribution:</b> <span class="i18n" data-key="Scatter models (fence posts, street lamps, trees) along curves with defined spacing, height offsets, and rotational jitter.">Scatter models (fence posts, street lamps, trees) along curves with defined spacing, height offsets, and rotational jitter.</span></li>
-  </ul>
-
-  <!-- 7. Lighting -->
-  <h2 id="Lighting"><img src="assets/icons/bake_ambient_tool_icon.png" class="icon-h2" alt=""> 7. <span class="i18n" data-key="Lighting: 162-ray Halton Lightbake">Lighting: 162-ray Halton Lightbake</span></h2>
-  <!-- Screenshot removed per request -->
-  <ul>
-    <li><b class="i18n" data-key="162 Halton Rays per Vertex:">162 Halton Rays per Vertex:</b> <span class="i18n" data-key="Evaluates hemispherical quasi-random Halton (2, 3) samples per vertex to compute sky occlusion and indirect light bounce.">Evaluates hemispherical quasi-random Halton (2, 3) samples per vertex to compute sky occlusion and indirect light bounce.</span></li>
-    <li><b class="i18n" data-key="Quadratic Spotlight Attenuation:">Quadratic Spotlight Attenuation:</b> <span class="i18n" data-key="Strict implementation of Source SDK 2013 <code>ComputeLightAtPoints</code> equations with smooth cosine transitions between inner and outer cones.">Strict implementation of Source SDK 2013 <code>ComputeLightAtPoints</code> equations with smooth cosine transitions between inner and outer cones.</span></li>
-    <li><b class="i18n" data-key="Strict LDR Pipeline:">Strict LDR Pipeline:</b> <span class="i18n" data-key="Operates without soft-shoulder compression, preserving deep shadows and authentic high-contrast lighting matching VRAD compiler output.">Operates without soft-shoulder compression, preserving deep shadows and authentic high-contrast lighting matching VRAD compiler output.</span></li>
-  </ul>
-
-  <!-- 8. Materials -->
-  <h2 id="Materials"><img src="assets/icons/material_lg.png" class="icon-h2" alt=""> 8. <span class="i18n" data-key="Material Editor &amp; Texturing">Material Editor &amp; Texturing</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="High-Speed Material Indexing:">High-Speed Material Indexing:</b> <span class="i18n" data-key="Indexes over 100,000 VMT materials across mounted VPKs and game directories in 1-2 seconds.">Indexes over 100,000 VMT materials across mounted VPKs and game directories in 1-2 seconds.</span></li>
-    <li><b class="i18n" data-key="Shader Inspection:">Shader Inspection:</b> <span class="i18n" data-key="Native parsing of <code>LightmappedGeneric</code>, <code>VertexLitGeneric</code>, <code>WorldVertexTransition</code>, <code>Water</code>, and <code>Sprite</code> parameters.">Native parsing of <code>LightmappedGeneric</code>, <code>VertexLitGeneric</code>, <code>WorldVertexTransition</code>, <code>Water</code>, and <code>Sprite</code> parameters.</span></li>
-    <li><b class="i18n" data-key="Face Edit Controls:">Face Edit Controls:</b> <span class="i18n" data-key="Precision texture placement with Fit, Justify, Shift, Scale, and Rotate options across World and Face coordinates.">Precision texture placement with Fit, Justify, Shift, Scale, and Rotate options across World and Face coordinates.</span></li>
-    <li><b class="i18n" data-key="Utility Materials:">Utility Materials:</b> <span class="i18n" data-key="Rapid application of <code>tools/toolsnodraw</code>, <code>tools/toolsclip</code>, <code>tools/toolstrigger</code>, <code>tools/toolshint</code>, and <code>tools/toolsskip</code>.">Rapid application of <code>tools/toolsnodraw</code>, <code>tools/toolsclip</code>, <code>tools/toolstrigger</code>, <code>tools/toolshint</code>, and <code>tools/toolsskip</code>.</span></li>
-  </ul>
-
-  <!-- 9. Shaders -->
-  <h2 id="Shaders"><img src="assets/icons/skybox_2d.png" class="icon-h2" alt=""> 9. <span class="i18n" data-key="Engine Shaders (Water Refraction &amp; 2D Skybox)">Engine Shaders (Water Refraction &amp; 2D Skybox)</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="Source Water Shader:">Source Water Shader:</b> <span class="i18n" data-key="Executes real screen-space refraction (<code>refract: true</code>), surface ripples, Fresnel reflections, and exponential volumetric depth fog governed by <code>$fogstart</code> and <code>$fogend</code>.">Executes real screen-space refraction (<code>refract: true</code>), surface ripples, Fresnel reflections, and exponential volumetric depth fog governed by <code>$fogstart</code> and <code>$fogend</code>.</span></li>
-    <li><b class="i18n" data-key="Seamless 2D Skybox:">Seamless 2D Skybox:</b> <span class="i18n" data-key="Mathematical continuity across all 12 cubemap edges (MSE = 0.0), eliminating zenith pinching and horizon alignment seams.">Mathematical continuity across all 12 cubemap edges (MSE = 0.0), eliminating zenith pinching and horizon alignment seams.</span></li>
-    <li><b class="i18n" data-key="Sprite &amp; Entity Rendering:">Sprite &amp; Entity Rendering:</b> <span class="i18n" data-key="Unlit + Translucent rendering without non-linear alpha distortion, removing dark rectangular artifacts around light bulbs and sprites.">Unlit + Translucent rendering without non-linear alpha distortion, removing dark rectangular artifacts around light bulbs and sprites.</span></li>
-  </ul>
-
-  <!-- 10. Selection & Physics -->
-  <h2 id="Selection"><img src="assets/icons/select_tool_icon.png" class="icon-h2" alt=""> 10. <span class="i18n" data-key="Selection Stencil &amp; .PHY Collision Pipeline">Selection Stencil &amp; .PHY Collision Pipeline</span></h2>
-  <!-- Screenshot removed per request -->
-  <ul>
-    <li><b class="i18n" data-key="Subpixel Stencil Silhouette Outline:">Subpixel Stencil Silhouette Outline:</b> <span class="i18n" data-key="A two-pass screen-space shader renders models into an <code>R8Unorm</code> mask and applies a 12-tap radial bilinear filter with parabolic alpha falloff. Produces smooth golden silhouettes (<code>#f5c518</code>) while keeping surface textures clear.">A two-pass screen-space shader renders models into an <code>R8Unorm</code> mask and applies a 12-tap radial bilinear filter with parabolic alpha falloff. Produces smooth golden silhouettes (<code>#f5c518</code>) while keeping surface textures clear.</span></li>
-    <li><b class="i18n" data-key="Precise .PHY Collision Pipeline:">Precise .PHY Collision Pipeline:</b> <span class="i18n" data-key="Reconstructed Havok/IVP compact surface parser with corrected spatial transformations <code>[zВ·M, -xВ·M, -yВ·M]</code> and coplanar edge elimination (hiding interior diagonals on flat faces where normal dot product &gt; 0.985).">Reconstructed Havok/IVP compact surface parser with corrected spatial transformations <code>[zВ·M, -xВ·M, -yВ·M]</code> and coplanar edge elimination (hiding interior diagonals on flat faces where normal dot product &gt; 0.985).</span></li>
-  </ul>
-
-  <!-- 11. Logic -->
-  <h2 id="Logic"><img src="assets/icons/entity_tool_icon.png" class="icon-h2" alt=""> 11. <span class="i18n" data-key="Entity I/O &amp; Connection Graphs">Entity I/O &amp; Connection Graphs</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="Visual Connection Inspector:">Visual Connection Inspector:</b> <span class="i18n" data-key="Review all entity outputs, targeted entities, input actions, parameters, and firing delays.">Review all entity outputs, targeted entities, input actions, parameters, and firing delays.</span></li>
-    <li><b class="i18n" data-key="Strict Typo Prevention:">Strict Typo Prevention:</b> <span class="i18n" data-key="Targetname selectors automatically list valid entities matching class criteria.">Targetname selectors automatically list valid entities matching class criteria.</span></li>
-    <li><b class="i18n" data-key="FGD Parser:">FGD Parser:</b> <span class="i18n" data-key="Fully parses Valve FGD files for Half-Life 2, Counter-Strike: Source, Team Fortress 2, and Garry's Mod.">Fully parses Valve FGD files for Half-Life 2, Counter-Strike: Source, Team Fortress 2, and Garry's Mod.</span></li>
-  </ul>
-
-  <!-- 12. Automation -->
-  <h2 id="Automation"><img src="assets/icons/ui_rocket_launch.png" class="icon-h2" alt=""> 12. <span class="i18n" data-key="Automation: Propper, Lump 40 Pack, Sprinkle">Automation: Propper, Lump 40 Pack, Sprinkle</span></h2>
-  <ul>
-    <li><b class="i18n" data-key="Integrated Propper Tool:">Integrated Propper Tool:</b> <span class="i18n" data-key="Convert brush assemblies directly into static prop models (<code>prop_static</code>) using StudioMDL, with customizable surface properties, mass, smoothing angles, and convex physics hulls (<code>$concave</code>).">Convert brush assemblies directly into static prop models (<code>prop_static</code>) using StudioMDL, with customizable surface properties, mass, smoothing angles, and convex physics hulls (<code>$concave</code>).</span></li>
-    <li><b class="i18n" data-key="Lump 40 Packfile (VIDE Replacement):">Lump 40 Packfile (VIDE Replacement):</b> <span class="i18n" data-key="Automatically analyzes map dependencies and writes missing textures, models, sounds, and particles directly into the compiled BSP pakfile.">Automatically analyzes map dependencies and writes missing textures, models, sounds, and particles directly into the compiled BSP pakfile.</span></li>
-    <li><b class="i18n" data-key="Sprinkle Tool:">Sprinkle Tool:</b> <span class="i18n" data-key="Procedurally scatters props (e.g. foliage, pebbles, urban debris) over selected surfaces with slope constraints, height thresholds, and random yaw.">Procedurally scatters props (e.g. foliage, pebbles, urban debris) over selected surfaces with slope constraints, height thresholds, and random yaw.</span></li>
-  </ul>
-
-  <!-- 13. Playtest -->
-  <h2 id="Playtest"><img src="assets/icons/control_play.png" class="icon-h2" alt=""> 13. <span class="i18n" data-key="In-Editor Playtest Mode (F6)">In-Editor Playtest Mode (F6)</span></h2>
-  <p class="i18n" data-key="Evaluate sightlines, scale, and navigation instantly without compiling:">
-    Evaluate sightlines, scale, and navigation instantly without compiling:
-  </p>
-  <ul>
-    <li><span class="i18n" data-key="Press F6 to enter a first-person player controller with gravity, collision detection, jumping (Space), and crouching (Ctrl).">Press F6 to enter a first-person player controller with gravity, collision detection, jumping (Space), and crouching (Ctrl).</span></li>
-    <li><span class="i18n" data-key="Toggle noclip flight via V or N with flight speeds up to 800 units/second via Shift.">Toggle noclip flight via V or N with flight speeds up to 800 units/second via Shift.</span></li>
-  </ul>
-
-  <!-- 14. Online -->
-  <h2 id="Online"><img src="assets/icons/coordinate_frame_world.png" class="icon-h2" alt=""> 14. <span class="i18n" data-key="Online Collaborative Editing (WIP)">Online Collaborative Editing (WIP)</span></h2>
-  <p class="i18n" data-key="Enables concurrent multi-user level design over standard TCP or relay servers with synchronized edits, teammate cursor frustums, and conflict isolation.">
-    Enables concurrent multi-user level design over standard TCP or relay servers with synchronized edits, teammate cursor frustums, and conflict isolation.
-  </p>
-
-    <!-- 15. MCP -->
-  <h2 id="MCP"><img src="assets/icons/ui_lifebuoy.png" class="icon-h2" alt=""> 15. <span class="i18n" data-key="Model Context Protocol (MCP) AI Integration">Model Context Protocol (MCP) AI Integration</span></h2>
-  <p class="i18n" data-key="NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>http://127.0.0.1:47823/mcp</code>. This interface allows AI coding assistants (such as Claude Code, Cursor, Windsurf, or custom automation scripts) to inspect, construct, sculpt, and compile maps in real time on the active document.">
-    NoDraw embeds an official Model Context Protocol (MCP) server listening on <code>http://127.0.0.1:47823/mcp</code>. This interface allows AI coding assistants (such as Claude Code, Cursor, Windsurf, or custom automation scripts) to inspect, construct, sculpt, and compile maps in real time on the active document.
-  </p>
-
-  <div class="callout-box callout-important">
-    <b class="i18n" data-key="Connection Command for Claude Code:">Connection Command for Claude Code:</b><br>
-    <code>claude mcp add --transport http nodraw http://127.0.0.1:47823/mcp</code>
-  </div>
-
-  <p class="i18n" data-key="Every operation executed by the AI agent is recorded as a single atomic undo step (Ctrl+Z). The user camera smoothly flies to where the agent is working, making the construction process visible as it happens.">
-    Every operation executed by the AI agent is recorded as a single atomic undo step (Ctrl+Z). The user camera smoothly flies to where the agent is working, making the construction process visible as it happens.
-  </p>
-
-  <table class="wikitable">
-    <thead>
-      <tr>
-        <th style="width: 25%;" class="i18n" data-key="Tool Group">Tool Group</th>
-        <th style="width: 35%;" class="i18n" data-key="MCP Tool Calls">MCP Tool Calls</th>
-        <th style="width: 40%;" class="i18n" data-key="Capability">Capability</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><b class="i18n" data-key="Inspection">Inspection</b></td>
-        <td><code>map_info</code>, <code>list_objects</code>, <code>selection</code>, <code>ground</code></td>
-        <td class="i18n" data-key="Retrieve map boundaries, query geometry, probe terrain elevation, and inspect player selection.">Retrieve map boundaries, query geometry, probe terrain elevation, and inspect player selection.</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Solids &amp; Brushes">Solids &amp; Brushes</b></td>
-        <td><code>create_block</code>, <code>create_primitive</code>, <code>carve</code>, <code>hollow</code>, <code>clip</code>, <code>mesh</code></td>
-        <td class="i18n" data-key="Build graybox structures, parametric primitives (wedges, arches, spiral stairs), boolean carves, extrude/inset faces.">Build graybox structures, parametric primitives (wedges, arches, spiral stairs), boolean carves, extrude/inset faces.</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Displacements">Displacements</b></td>
-        <td><code>create_terrain</code>, <code>sculpt</code>, <code>modify</code>, <code>stack</code>, <code>sew</code>, <code>blend_by_slope</code></td>
-        <td class="i18n" data-key="Generate terrain grids, brush sculpt, procedural modifier stack (Noise, Erosion, Terrace), auto-weld seams.">Generate terrain grids, brush sculpt, procedural modifier stack (Noise, Erosion, Terrace), auto-weld seams.</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Splines &amp; Paths">Splines &amp; Paths</b></td>
-        <td><code>path</code> (modes: road, channel, strip, wall, brushes, props)</td>
-        <td class="i18n" data-key="Sweep roads, rivers, retaining walls, tunnels, and distribute props along Bezier curves.">Sweep roads, rivers, retaining walls, tunnels, and distribute props along Bezier curves.</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Entities &amp; Logic">Entities &amp; Logic</b></td>
-        <td><code>create_entity</code>, <code>connections</code>, <code>set_keys</code>, <code>sprinkle</code>, <code>propper</code></td>
-        <td class="i18n" data-key="Spawn FGD entities, connect Input/Output logic, scatter foliage/rocks, merge brushes into props.">Spawn FGD entities, connect Input/Output logic, scatter foliage/rocks, merge brushes into props.</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Render &amp; Check">Render &amp; Check</b></td>
-        <td><code>view</code>, <code>snapshot</code>, <code>camera</code>, <code>compile</code></td>
-        <td class="i18n" data-key="Evaluate real-time lighting, capture validation PNG screenshots, fly camera, run background BSP compiles.">Evaluate real-time lighting, capture validation PNG screenshots, fly camera, run background BSP compiles.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p class="i18n" data-key="Detailed instructions, coordinate guidelines, and prompt templates are included in the downloadable distribution as <code>MCP_AI_GUIDE.txt</code>.">
-    Detailed instructions, coordinate guidelines, and prompt templates are included in the downloadable distribution as <code>MCP_AI_GUIDE.txt</code>.
-  </p>
-
-  <!-- 16. Comparison -->
-  <h2 id="Comparison"><img src="assets/icons/select_tool_icon.png" class="icon-h2" alt=""> 16. <span class="i18n" data-key="Hammer++ vs NoDraw Specification">Hammer++ vs NoDraw Specification</span></h2>
-  <table class="wikitable">
-    <thead>
-      <tr>
-        <th style="width: 25%;" class="i18n" data-key="Capability">Capability</th>
-        <th style="width: 37%;">Hammer++</th>
-        <th style="width: 38%;">NoDraw</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><b class="i18n" data-key="Architecture &amp; Core">Architecture &amp; Core</b></td>
-        <td class="old-cell i18n" data-key="MFC / C++ 2003 (32-bit legacy constraints)">MFC / C++ 2003 (32-bit legacy constraints)</td>
-        <td class="win-cell i18n" data-key="Rust + WebGPU (64-bit memory-safe architecture)">Rust + WebGPU (64-bit memory-safe architecture)</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Prop Silhouette Selection">Prop Silhouette Selection</b></td>
-        <td class="old-cell i18n" data-key="1-pixel aliased binary mask">1-pixel aliased binary mask</td>
-        <td class="win-cell i18n" data-key="12-tap Subpixel Anti-Aliased Stencil Outline">12-tap Subpixel Anti-Aliased Stencil Outline</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Physics (.PHY) Display">Physics (.PHY) Display</b></td>
-        <td class="old-cell i18n" data-key="Obscures model with dense internal wireframes">Obscures model with dense internal wireframes</td>
-        <td class="win-cell i18n" data-key="Coplanar edge filter (clean geometric hulls)">Coplanar edge filter (clean geometric hulls)</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Lighting Preview">Lighting Preview</b></td>
-        <td class="old-cell i18n" data-key="Basic OpenGL approximation / VRAD wait">Basic OpenGL approximation / VRAD wait</td>
-        <td class="win-cell i18n" data-key="162-ray Halton Lightbake in real-time">162-ray Halton Lightbake in real-time</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Packfile Compilation">Packfile Compilation</b></td>
-        <td class="old-cell i18n" data-key="Requires external VIDE / bspzip tools">Requires external VIDE / bspzip tools</td>
-        <td class="win-cell i18n" data-key="Built-in Lump 40 injection in one step">Built-in Lump 40 injection in one step</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Instant Walkthrough">Instant Walkthrough</b></td>
-        <td class="old-cell i18n" data-key="Requires full BSP compilation (F9)">Requires full BSP compilation (F9)</td>
-        <td class="win-cell i18n" data-key="Instant F6 Playtest with noclip and player physics">Instant F6 Playtest with noclip and player physics</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="Terrain Modification">Terrain Modification</b></td>
-        <td class="old-cell i18n" data-key="Standard destructive displacement vertex edits">Standard destructive displacement vertex edits</td>
-        <td class="win-cell i18n" data-key="Non-destructive modifier stack &amp; Auto-Sewing">Non-destructive modifier stack &amp; Auto-Sewing</td>
-      </tr>
-      <tr>
-        <td><b class="i18n" data-key="AI / Scripting Protocol">AI / Scripting Protocol</b></td>
-        <td class="old-cell i18n" data-key="None (closed binary)">None (closed binary)</td>
-        <td class="win-cell i18n" data-key="Embedded MCP Server (Model Context Protocol)">Embedded MCP Server (Model Context Protocol)</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- 17. Hotkeys -->
-  <h2 id="Hotkeys"><img src="assets/icons/path_tool_icon.png" class="icon-h2" alt=""> 17. <span class="i18n" data-key="Keyboard Shortcuts">Keyboard Shortcuts</span></h2>
-  <table class="wikitable" style="max-width: 650px;">
-    <thead>
-      <tr>
-        <th style="width: 200px;" class="i18n" data-key="Shortcut">Shortcut</th>
-        <th class="i18n" data-key="Editor Action">Editor Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="keyboard-key">F6</span></td>
-        <td class="i18n" data-key="Toggle real-time in-editor Playtest mode">Toggle real-time in-editor Playtest mode</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">V</span> / <span class="keyboard-key">N</span></td>
-        <td class="i18n" data-key="Toggle Noclip flight mode during Playtest">Toggle Noclip flight mode during Playtest</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">Alt</span> + <span class="keyboard-key">G</span></td>
-        <td class="i18n" data-key="Go to Coordinates (supports console setpos / setang strings)">Go to Coordinates (supports console setpos / setang strings)</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">G</span></td>
-        <td class="i18n" data-key="Group selected objects">Group selected objects</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">U</span></td>
-        <td class="i18n" data-key="Ungroup selected group">Ungroup selected group</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Alt</span> + <span class="keyboard-key">S</span></td>
-        <td class="i18n" data-key="In-context 3D Skybox editing (isolates skybox at 1:1 scale)">In-context 3D Skybox editing (isolates skybox at 1:1 scale)</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Esc</span></td>
-        <td class="i18n" data-key="Immediately cancel active background compilation processes">Immediately cancel active background compilation processes</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span></td>
-        <td class="i18n" data-key="Open map file (.vmf / .bsp)">Open map file (.vmf / .bsp)</td>
-      </tr>
-      <tr>
-        <td><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">S</span></td>
-        <td class="i18n" data-key="Save active map document">Save active map document</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- 18. Download -->
-  <h2 id="Download"><img src="assets/icons/control_play.png" class="icon-h2" alt=""> 18. <span class="i18n" data-key="Download &amp; Installation">Download &amp; Installation</span></h2>
-  <p class="i18n" data-key="NoDraw is distributed as an independent, portable ZIP package for authorized beta testers:">
-    NoDraw is distributed as an independent, portable ZIP package for authorized beta testers:
-  </p>
-
-  <table class="wikitable" style="max-width: 650px;">
-    <tr>
-      <th colspan="2" class="i18n" data-key="Distribution Package Specifications">Distribution Package Specifications</th>
-    </tr>
-    <tr>
-      <td><b class="i18n" data-key="Archive Name">Archive Name</b></td>
-      <td><code>nodraw-beta-tester.zip</code></td>
-    </tr>
-    <tr>
-      <td><b class="i18n" data-key="File Size">File Size</b></td>
-      <td>17.5 MB (Compressed ZIP)</td>
-    </tr>
-    <tr>
-      <td><b class="i18n" data-key="Build Date">Build Date</b></td>
-      <td>2026-11-03</td>
-    </tr>
-    <tr>
-      <td><b class="i18n" data-key="Package Contents">Package Contents</b></td>
-      <td><code>NoDraw.exe</code> (Release x64), <code>icons/</code> (1154 items), <code>plugins/</code> (light_shader), <code>README.txt</code></td>
-    </tr>
-    <tr>
-      <td><b class="i18n" data-key="Direct Download">Direct Download</b></td>
-      <td>
-        <a href="downloads/nodraw-beta-tester.zip" class="btn-steam-gold" download>
-          <img src="assets/icons/control_play.png" class="ico" alt="">
-          <span class="i18n" data-key="Download NoDraw Beta (.ZIP)">Download NoDraw Beta (.ZIP)</span>
+      <section class="article-section" id="Download">
+        <h2 data-ru="Установка и запуск">Installing and launching</h2>
+        <p data-ru="Установщик NoDraw для Windows x64 ставит редактор для текущего пользователя и добавляет ярлык в меню «Пуск».">The NoDraw installer for Windows x64 installs the editor for your user account and adds a Start menu shortcut.</p>
+        <a class="download-action" href="https://github.com/env-snake/nodraw-site/releases" data-beta-download>
+          <img src="assets/icons/control_play.png" alt="">
+          <span data-ru="Скачать NoDraw-Setup.exe">Download NoDraw-Setup.exe</span>
         </a>
-      </td>
-    </tr>
-  </table>
+        <dl class="package">
+          <div><dt data-ru="Текущая бета">Current beta</dt><dd data-beta-version>—</dd></div>
+          <div><dt data-ru="Размер файла">File size</dt><dd data-beta-size>—</dd></div>
+          <div><dt data-ru="Заметки к выпуску">Release notes</dt><dd><a href="https://github.com/env-snake/nodraw-site/releases" data-beta-release data-ru="Выпуск на GitHub">Release on GitHub</a></dd></div>
+        </dl>
+        <ol>
+          <li data-ru="Запусти NoDraw-Setup.exe и открой NoDraw из меню «Пуск».">Run NoDraw-Setup.exe and open NoDraw from the Start menu.</li>
+          <li data-ru="Если Garry’s Mod не найден автоматически, выбери папку игры в Settings → Game Folder.">If Garry’s Mod is not detected automatically, pick the game folder in Settings → Game Folder.</li>
+          <li data-ru="Создай карту в Welcome или открой VMF через File → Open. Также можно перетащить файл в окно.">Create a map in Welcome or open a VMF through File → Open. You can also drag the file into the window.</li>
+          <li data-ru="Обновления проверяются при запуске установленной беты. Ручная проверка доступна в Help → Check for updates. Сохрани правки карты перед установкой.">The installed beta checks for updates at startup. You can also use Help → Check for updates. Save map edits before installing an update.</li>
+        </ol>
+      </section>
 
-  <h3 class="i18n" data-key="Quickstart Setup">Quickstart Setup</h3>
-  <ol>
-    <li class="i18n" data-key="Extract <code>nodraw-beta-tester.zip</code> into any local directory (e.g. <code>D:\NoDraw</code>).">Extract <code>nodraw-beta-tester.zip</code> into any local directory (e.g. <code>D:\NoDraw</code>).</li>
-    <li class="i18n" data-key="Verify that the <code>icons/</code> and <code>plugins/</code> folders reside alongside <code>NoDraw.exe</code>.">Verify that the <code>icons/</code> and <code>plugins/</code> folders reside alongside <code>NoDraw.exe</code>.</li>
-    <li class="i18n" data-key="Launch <b><code>NoDraw.exe</code></b>. No installation or administrative elevation required.">Launch <b><code>NoDraw.exe</code></b>. No installation or administrative elevation required.</li>
-    <li class="i18n" data-key="NoDraw automatically searches Steam registry paths and <code>libraryfolders.vdf</code> to link Garry's Mod content. For custom folder setups, configure via <b>Settings в†’ Game Folder</b>.">NoDraw automatically searches Steam registry paths and <code>libraryfolders.vdf</code> to link Garry's Mod content. For custom folder setups, configure via <b>Settings в†’ Game Folder</b>.</li>
-    <li class="i18n" data-key="Open a map by pressing <span class='keyboard-key'>Ctrl</span> + <span class='keyboard-key'>O</span> or dragging a <code>.vmf</code> file directly into the application window.">Open a map by pressing <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span> or dragging a <code>.vmf</code> file directly into the application window.</li>
-  </ol>
+      <section class="article-section" id="Interface">
+        <h2 data-ru="Работа с картой">Editing a map</h2>
+        <p data-ru="Рабочая область объединяет 3D-камеру, ортографические виды, Tool, Properties, Scene и Assets. Текущие команды и параметры появляются в Tool или Properties.">The workspace has a 3D camera, orthographic views, Tool, Properties, Scene, and Assets. The active tool’s controls appear in Tool or Properties.</p>
+        <table class="workflows">
+          <thead><tr><th scope="col" data-ru="Задача">Task</th><th scope="col" data-ru="Где и как">Workflow</th></tr></thead>
+          <tbody>
+            <tr id="Mesh_Modeling"><th scope="row" data-ru="Браши и Mesh">Brushes and Mesh</th><td id="Primitives" data-ru="Построй браш инструментом Block. В Mesh доступны вершины, рёбра, грани, экструзия, Inset, Bevel, Hollow и Bridge с предпросмотром.">Create a brush with Block. Mesh provides vertex, edge, and face editing, plus extrusion, Inset, Bevel, Hollow, and Bridge with previews.</td></tr>
+            <tr id="Displacements"><th scope="row" data-ru="Дисплейсменты">Displacements</th><td data-ru="Создавай и редактируй диспы, растушёвывай слои материала, сшивай кромки. Select → Displacements содержит переключатель Auto-sew.">Create and sculpt displacements, paint material blends, and sew edges. Select → Displacements includes the Auto-sew toggle.</td></tr>
+            <tr id="Paths"><th scope="row" data-ru="Дороги">Roads</th><td data-ru="Path Tool строит дорожную ленту или меняет существующие диспы. Можно настраивать ширину, покраску blend и примыкания.">Path Tool creates a road ribbon or reshapes existing displacements. It supports adjustable width, blend painting, and joins.</td></tr>
+            <tr id="Materials"><th scope="row" data-ru="Материалы и модели">Materials and models</th><td data-ru="Двойной клик по материалу применяет его к выделенным брашам. Двойной клик по модели заменяет модель выбранного пропа.">Double-click a material to apply it to selected brushes. Double-click a model to replace the model of a selected prop.</td></tr>
+            <tr id="Model_Viewer"><th scope="row">Propper / Model Viewer</th><td data-ru="Преврати браши, диспы и пропы в MDL с запеканием blend и настройкой LOD. В Model Viewer доступны QC/SMD, открытие исходников в Blender и пересборка.">Turn brushes, displacements, and props into an MDL with baked blends and configurable LODs. Model Viewer provides QC/SMD sources, Blender opening, and recompilation.</td></tr>
+            <tr id="Selection"><th scope="row" data-ru="Выделение и размещение">Selection and placement</th><td data-ru="Используй Lasso в 2D и 3D, X-Ray в Mesh, Duplicate для массивов, Sprinkle для расстановки пропов и Move to Floor для посадки на опору.">Use Lasso in 2D and 3D, X-Ray in Mesh, Duplicate for arrays, Sprinkle for scattering props, and Move to Floor to seat props on a surface.</td></tr>
+            <tr id="Logic"><th scope="row" data-ru="Сущности">Entities</th><td data-ru="Меняй класс, ключи, флаги, входы и выходы в Properties. Стрелки и Enter работают в списке классов.">Edit class, keys, flags, inputs, and outputs in Properties. Use the arrow keys and Enter in the class picker.</td></tr>
+          </tbody>
+        </table>
+      </section>
 
-  <footer id="footer">
-    <p class="i18n" data-key="footer_text">NoDraw Level Editor - Next-Generation Source Engine Level Design Environment.</p>
-  </footer>
-</main>
+      <section class="article-section" id="Lighting">
+        <h2 data-ru="Свет и 3D-скайбокс">Lighting and 3D sky</h2>
+        <p data-ru="Lighting Preview показывает быстрый свет и уточняет его в фоне. Режим Exact считает точное освещение, а локальная правка пропа или браша обновляет затронутую область. Для финальной проверки собери карту и открой её в игре.">Lighting Preview shows a fast lighting pass and refines it in the background. Exact mode computes more detailed lighting, and local prop or brush edits update the affected area. Compile and inspect the map in-game for final checks.</p>
+        <p id="Shaders" data-ru="В режиме 3D Sky можно просмотреть и отредактировать отдельный слой, затем собрать уменьшенную геометрию с учётом sky_camera. В превью painted-неба гизмо поворота env_sun меняет направление видимого солнца.">In 3D Sky mode you can preview and edit a separate layer, then generate scaled geometry using sky_camera. In the painted-sky preview, rotating env_sun changes the visible sun direction.</p>
+      </section>
 
-<!-- Modal Lightbox -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
-  <img id="modalImg" src="" alt="Enlarged Preview">
-</div>
+      <section class="article-section" id="Compile">
+        <h2 data-ru="Сборка и запуск в игре">Compiling and playtesting</h2>
+        <ol>
+          <li data-ru="Открой Compile и выбери пресет. F9 собирает BSP настроенными инструментами карты.">Open Compile and select a preset. F9 builds the BSP with the configured map tools.</li>
+          <li data-ru="При GPU-компиляции отдельное окно показывает этап, прогресс и журнал. После завершения вернись в NoDraw. В Compile остаются результат, фильтры, подсказки и переход к координатам для поддерживаемых ошибок.">GPU compilation has a separate progress and log window. Return to NoDraw when it finishes. Compile keeps the result, filters, explanations, and coordinate links for supported diagnostics.</li>
+          <li id="Playtest" data-ru="Используй F6 для быстрой проверки масштаба и проходов в редакторе. Для финальной проверки открой собранный BSP в Garry’s Mod.">Use F6 to check scale and routes in the editor. Open the compiled BSP in Garry’s Mod for final verification.</li>
+        </ol>
+      </section>
 
-<script>
-  // Bilingual translation dictionary (English / Russian)
-  const TRANSLATIONS = {
-    ru: {
-      "Download Beta (.ZIP)": "Скачать билд (.ZIP)",
-      "Download Closed Beta (17.5 MB)": "Скачать закрытый билд (16.8 МБ)",
-      "Download NoDraw Beta (.ZIP)": "Скачать NoDraw Beta (.ZIP)",
-      "NAVIGATION": "НАВИГАЦИЯ",
-      "Main Page": "Главная страница",
-      "Architecture": "Архитектура",
-      "User Interface": "Интерфейс",
-      "Beta Download": "Скачать билд",
-      "MESH & BRUSHES": "МОДЕЛИРОВАНИЕ И МЕШИ",
-      "Shapes & Primitives": "Фигуры и Примитивы",
-      "DISPLACEMENTS": "ДИСПЛЕЙСМЕНТЫ",
-      "Sculpt Brushes": "Скульптинг и Кисти",
-      "Modifier Stack": "Стек модификаторов",
-      "Auto-Sew Seams": "Auto-Sew и Сшив швов",
-      "SPLINES & PATHS": "СПЛАЙНЫ И ПУТИ",
-      "Roads, Walls & Tunnels": "Дороги, реки, стены",
-      "Prop Distribution": "Расстановка пропов",
-      "LIGHTING & SHADERS": "ОСВЕЩЕНИЕ И ШЕЙДЕРЫ",
-      "Materials & UV Lock": "Материалы и UV Lock",
-      "Water & 2D Skybox": "Вода и 2D Скайбокс",
-      "TOOLS & PIPELINE": "ИНСТРУМЕНТЫ И СБОРКА",
-      ".PHY Collision Parser": "Коллизии .PHY",
-      "Entity I/O Connections": "Связи Entity I/O",
-      "Documentation": "Документация",
-      "Next-Generation Source Engine Level Editor — Technical Documentation & Manual": "Редактор карт нового поколения для Source Engine — Техническая документация и Руководство",
-      "Source & Garry's Mod Mapping Environment": "Среда левел-дизайна для Source и Garry's Mod",
-      "Developer": "Разработчик",
-      "Current Build": "Текущая версия",
-      "Render Backend": "Рендер-бэкенд",
-      "Target Engines": "Целевой движок",
-      "Map Formats": "Форматы карт",
-      "Model Formats": "Форматы моделей",
-      "Distribution": "Тип релиза",
-      "Closed Beta (Portable)": "Закрытое тестирование (Zero-Install)",
-      "Clean Game Integration:": "Чистая интеграция с игрой:",
-      "Contents": "Содержание документации",
-      "Overview & Core Architecture": "Архитектура и Концепция",
-      "Interface & Workspace Layout": "Рабочий интерфейс редактора",
-      "Brush & Mesh Modeling (CSG, Carve, Extrude, Bevel)": "Моделирование брашей и мешей (CSG, Carve, Extrude, Bevel)",
-      "Displacements & Terrain (Sculpting, Modifier Stack)": "Дисплейсменты и Ландшафт (Скульптинг, Модификаторы)",
-      "Splines & Path Tool": "Сплайны и Инструмент путей (Path Tool)",
-      "Lighting: 162-ray Halton Lightbake": "Освещение: Halton 162-ray Lightbake",
-      "Material Editor & Texturing": "Редактор материалов и Текстурирование",
-      "Engine Shaders (Water Refraction & 2D Skybox)": "Движковые шейдеры (Вода и 2D-скайбокс)",
-      "Selection Stencil & .PHY Collision Pipeline": "Выделение Stencil и Пайплайн коллизий .PHY",
-      "Entity I/O & Connection Graphs": "Связи энтити и Графы I/O",
-      "Automation: Propper, Lump 40 Pack, Sprinkle": "Автоматизация: Propper, Lump 40 Pack, Sprinkle",
-      "In-Editor Playtest Mode (F6)": "Режим мгновенного осмотра Playtest (F6)",
-      "Online Collaborative Editing (WIP)": "Сетевой режим совместной работы (WIP)",
-      "Model Context Protocol (MCP) AI Integration": "Интеграция с ИИ через Model Context Protocol (MCP)",
-      "Hammer++ vs NoDraw Specification": "Сравнение характеристик с Hammer++",
-      "Keyboard Shortcuts": "Горячие клавиши NoDraw",
-      "Download & Installation": "Установка и пакет для тестеров",
-      "Memory Safety (Rust):": "Память и надежность (Rust):",
-      "WebGPU Hardware Acceleration:": "Аппаратное ускорение WebGPU:",
-      "Deterministic Undo Transactions:": "Детерминированные транзакции (Undo/Redo):",
-      "Left Tool Strip:": "Панель инструментов слева:",
-      "Right Inspector (Tool / Properties / Details):": "Инспектор справа (Tool / Properties / Details):",
-      "Bottom Assets Explorer:": "Проводник ассетов снизу (Assets Explorer):",
-      "Non-Destructive Boolean CSG": "Неразрушающий CSG Boolean",
-      "Smart Carve": "Smart Carve",
-      "Mesh Operations: Extrude, Inset & Bevel": "Операции с мешами: Extrude, Inset и Bevel",
-      "Vertex Editing with UV Lock": "Вертексное редактирование с защитой UV Lock",
-      "Standard Volumes:": "Базовые объёмы:",
-      "Arches & Toruses:": "Архитектурные арки и торусы:",
-      "Staircase Generators:": "Генератор лестниц:",
-      "Interactive Sculpting Brushes": "Интерактивные кисти скульпта (Sculpt Tool)",
-      "Non-Destructive Modifier Stack": "Неразрушающий стек модификаторов (Modifier Stack)",
-      "Auto-Sew Seams & T-Junctions": "Автоматический сшив швов (Auto-Sew Seams & T-Junctions)",
-      "Slope-Based Alpha Blending": "Блендинг по уклону нормалей (Blend by slope)",
-      "Terrain Shaping:": "Деформация террейна:",
-      "Profile Sweeping:": "Протяжка профилей:",
-      "Prop Distribution:": "Расстановка пропов вдоль кривой:",
-      "162 Halton Rays per Vertex:": "162 квазислучайных луча Халтона (Halton 2, 3):",
-      "Quadratic Spotlight Attenuation:": "Квадратичный спад спотлайтов:",
-      "Strict LDR Pipeline:": "Честный LDR-контраст:",
-      "High-Speed Material Indexing:": "Индексатор 100k+ VMT:",
-      "Shader Inspection:": "Шейдерный инспектор:",
-      "Face Edit Controls:": "Face Edit:",
-      "Utility Materials:": "Служебные текстуры:",
-      "Source Water Shader:": "Шейдер воды Source:",
-      "Seamless 2D Skybox:": "Бесшовный 2D-скайбокс:",
-      "Sprite & Entity Rendering:": "Спрайты и иконки:",
-      "Subpixel Stencil Silhouette Outline:": "Субпиксельный Stencil Outline:",
-      "Precise .PHY Collision Pipeline:": "Точные коллизии .PHY:",
-      "Visual Connection Inspector:": "Инспектор связей Input/Output:",
-      "Strict Typo Prevention:": "Защита от опечаток:",
-      "FGD Parser:": "Парсер FGD:",
-      "Integrated Propper Tool:": "Встроенный Propper:",
-      "Lump 40 Packfile (VIDE Replacement):": "Упаковка в BSP Lump 40 (Замена VIDE):",
-      "Sprinkle Tool:": "Sprinkle Tool:",
-      "Connection Command for Claude Code:": "Команда подключения для Claude Code:",
-      "Tool Group": "Группа инструментов",
-      "MCP Tool Calls": "Вызовы инструментов",
-      "Capability": "Возможности",
-      "Inspection": "Инспекция карты",
-      "Solids & Brushes": "Браши и тела",
-      "Displacements": "Дисплейсменты",
-      "Splines & Paths": "Сплайны и пути",
-      "Entities & Logic": "Энтити и логика",
-      "Render & Check": "Рендер и проверка",
-      "Architecture & Core": "Ядро и язык",
-      "Prop Silhouette Selection": "Выделение силуэта пропов",
-      "Physics (.PHY) Display": "Коллизии моделей .PHY",
-      "Lighting Preview": "Превью освещения",
-      "Packfile Compilation": "Упаковка в BSP (Pack)",
-      "Instant Walkthrough": "Осмотр карты",
-      "Terrain Modification": "Моделирование ландшафта",
-      "AI / Scripting Protocol": "ИИ / Автоматизация",
-      "Shortcut": "Сочетание клавиш",
-      "Editor Action": "Действие в редакторе",
-      "Toggle real-time in-editor Playtest mode": "Включение / выключение режима Playtest",
-      "Toggle Noclip flight mode during Playtest": "Переключение Noclip-полёта во время Playtest",
-      "Go to Coordinates (supports console setpos / setang strings)": "Переход по координатам (поддержка строк setpos / setang)",
-      "Group selected objects": "Группировка выбранных объектов",
-      "Ungroup selected group": "Разгруппировка выбранной группы",
-      "In-context 3D Skybox editing (isolates skybox at 1:1 scale)": "Режим правки 3D-скайбокса на месте (1:1 масштаб)",
-      "Immediately cancel active background compilation processes": "Экстренная остановка фоновой компиляции карты",
-      "Open map file (.vmf / .bsp)": "Открыть файл карты (.vmf / .bsp)",
-      "Save active map document": "Сохранить карту",
-      "Distribution Package Specifications": "Характеристики тестерского архива",
-      "Archive Name": "Имя архива",
-      "File Size": "Размер файла",
-      "Build Date": "Дата сборки",
-      "Package Contents": "Состав пакета",
-      "Direct Download": "Ссылка на загрузку",
-      "Quickstart Setup": "Инструкция по быстрому запуску",
-      "Categories:": "Категории:"
-    }
-  };
+      <section class="article-section" id="Hotkeys">
+        <h2 data-ru="Горячие клавиши">Keyboard shortcuts</h2>
+        <table class="workflows">
+          <thead><tr><th scope="col" data-ru="Клавиша">Key</th><th scope="col" data-ru="Действие">Action</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><kbd>Ctrl+O</kbd> / <kbd>Ctrl+S</kbd></th><td data-ru="Открыть / сохранить карту">Open / save a map</td></tr>
+            <tr><th scope="row"><kbd>Ctrl+M</kbd></th><td data-ru="Открыть окно Transform с сохранёнными параметрами">Open Transform with the previous parameters</td></tr>
+            <tr><th scope="row"><kbd>Alt+Z</kbd> / <kbd>Alt+W</kbd></th><td data-ru="Переключить Mesh X-Ray / сетку диспов">Toggle Mesh X-Ray / displacement wireframe</td></tr>
+            <tr><th scope="row"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></th><td data-ru="Двигать выделенные компоненты Mesh по осям текущего вида">Move selected Mesh components along the current view axes</td></tr>
+            <tr><th scope="row"><kbd>Z</kbd></th><td data-ru="Включить или выключить полёт камерой">Toggle camera fly mode</td></tr>
+            <tr><th scope="row"><kbd>F6</kbd> / <kbd>F9</kbd></th><td data-ru="Быстрая проверка / компиляция карты">Quick playtest / compile the map</td></tr>
+          </tbody>
+        </table>
+      </section>
 
-  // Cache original English text on initial load
-  const originalTextMap = new Map();
+      <section class="article-section" id="MCP">
+        <h2 data-ru="Интеграция с MCP">MCP integration</h2>
+        <p data-ru="NoDraw предоставляет локальный MCP-интерфейс для инспекции карты, выделения и редактирования. Инструкция MCP_AI_GUIDE.txt входит в установщик.">NoDraw provides a local MCP interface for map inspection, selection, and editing. MCP_AI_GUIDE.txt is included with the installer.</p>
+      </section>
 
-  function setLang(lang) {
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    const targetBtn = document.getElementById(`btn-lang-${lang}`);
-    if (targetBtn) targetBtn.classList.add('active');
-
-    document.querySelectorAll('.i18n').forEach(el => {
-      if (!originalTextMap.has(el)) {
-        originalTextMap.set(el, el.textContent.trim());
-      }
-      const enText = originalTextMap.get(el);
-      if (lang === 'ru' && TRANSLATIONS.ru[enText]) {
-        el.textContent = TRANSLATIONS.ru[enText];
-      } else {
-        el.textContent = enText;
-      }
-    });
-
-    localStorage.setItem('nodraw-lang', lang);
-  }
-
-  // Restore language preference or default to English
-  const savedLang = localStorage.getItem('nodraw-lang') || 'en';
-  setLang(savedLang);
-
-  // Table of Contents Toggle
-  function toggleToc() {
-    const list = document.getElementById('toc-list');
-    const toggle = document.querySelector('.toc-toggle');
-    if (list.style.display === 'none') {
-      list.style.display = 'block';
-      toggle.textContent = '[hide]';
-    } else {
-      list.style.display = 'none';
-      toggle.textContent = '[show]';
-    }
-  }
-
-  // Lightbox
-  function openModal(src) {
-    document.getElementById('modalImg').src = src;
-    document.getElementById('modalOverlay').classList.add('active');
-  }
-
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
-  }
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  // Track active scroll section in sidebar
-  const sections = Array.from(document.querySelectorAll('h2[id], h1[id]'));
-  const navLinks = Array.from(document.querySelectorAll('.nav-list a'));
-
-  window.addEventListener('scroll', () => {
-    const scrollPos = window.scrollY + 100;
-    let currentId = 'top';
-    for (const sec of sections) {
-      if (sec.offsetTop <= scrollPos) {
-        currentId = sec.id;
-      }
-    }
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      link.classList.toggle('active', href === `#${currentId}`);
-    });
-  }, { passive: true });
-</script>
-
+      <footer class="article-footer">
+        <a href="#top" data-ru="К началу статьи">Back to top</a>
+        <span aria-hidden="true"> · </span>
+        <a href="https://github.com/env-snake/nodraw-site/releases" data-ru="Все выпуски">All releases</a>
+      </footer>
+    </main>
+  </div>
 </body>
 </html>

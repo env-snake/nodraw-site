@@ -1,0 +1,8 @@
+{
+  "build": 2,
+  "version": "0.1.0 beta 2",
+  "notes": "First NoDraw beta. Includes the independent GPU compile window, coordinate links in diagnostics, refreshed tools and menus, and update notifications. Save open maps before installing an update.",
+  "installer": "https://github.com/env-snake/nodraw-site/releases/download/v0.1.0-beta.2/NoDraw-Setup.exe",
+  "sha256": "b2c8a494bfbaa656e0fc747434c9880ff434709f38c154c5b91701abb3538025",
+  "bytes": 16498784
+}
