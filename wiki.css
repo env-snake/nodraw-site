@@ -143,3 +143,19 @@ h3 { margin: 17px 0 5px; font-size: 15px; color: #ededed; }
 .image-viewer img { max-height:85vh; max-width:92vw; object-fit:contain; }
 .image-viewer button { float:right; margin-bottom:8px; padding:5px 12px; border:1px solid #777; background:#303030; color:white; cursor:pointer; }
 @media(max-width:900px) { .feature-grid,.gallery { grid-template-columns:1fr; } }
+
+/* Custom NoDraw editor icon family and article guides. */
+.article-tabs { display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:24px; }
+.article-tabs a { padding:5px 10px; background:#292b2b; border:1px solid #444640; }
+.article-tabs a:hover { border-color:var(--gold); color:#f2ce82; }
+.title-icon { display:inline-block; width:40px; height:40px; vertical-align:middle; margin-right:12px; }
+.feature h3 img { width:40px; height:40px; }
+.tool-detail { display:inline-block; margin:3px 0 8px; color:var(--gold); }
+.guide-steps,.change-list { max-width:100ch; padding-left:24px; }
+.guide-steps li,.change-list li { padding:5px 0; }
+.guide-shot { margin:24px 0; max-width:1080px; border:1px solid var(--line); padding:7px; background:#202020; }
+.guide-shot .image-open img { aspect-ratio:auto; }
+.guide-shot figcaption { font-size:12px; color:var(--muted); padding:8px 4px 2px; }
+.panel-shot { max-width:454px; }
+.panel-shot .image-open { max-height:600px; overflow:hidden; }
+.panel-shot .image-open img { width:100%; height:auto; }

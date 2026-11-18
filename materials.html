@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NoDraw level editor for Source 1 and Garry's Mod. Download the Windows beta and find installation, editing, and compile instructions.">
+  <title>Materials and live colour — NoDraw Wiki</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="wiki.css">
+  <script defer src="wiki.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.png" alt="" width="37" height="37">
+      <strong>NoDraw</strong>
+      <span data-ru="Документация">Level Editor Wiki</span>
+    </a>
+  </header>
+  <div class="wiki" id="top">
+    <nav class="navigation" aria-label="Wiki navigation">
+      <p data-ru="NoDraw">NoDraw</p>
+      <ul>
+        <li><a href="index.html#Overview" data-ru="Обзор">Overview</a></li>
+        <li><a href="index.html#Download" data-ru="Скачать и установить">Download and install</a></li>
+        <li><a href="index.html#Interface" data-ru="Инструменты">Editing tools</a></li>
+        <li><a href="index.html#Compile" data-ru="Компиляция">Compiling a map</a></li>
+        <li><a href="index.html#Hotkeys" data-ru="Горячие клавиши">Keyboard shortcuts</a></li>
+      </ul>
+      <p data-ru="Категории">Categories</p><ul class="category-grid"><li><a href="index.html#Features" data-ru="Все инструменты">All tools</a></li><li><a href="workspace.html" data-ru="Интерфейс">Workspace</a></li><li><a href="changelog.html" data-ru="Версии и изменения">Versions and changes</a></li></ul>
+      <p data-ru="Ресурсы">Resources</p>
+      <ul>
+        <li><a href="https://github.com/env-snake/nodraw-site/releases" data-ru="Выпуски">Releases</a></li>
+        <li><a href="https://developer.valvesoftware.com/wiki/Valve_Hammer_Editor">Valve Hammer Editor</a></li>
+        <li><a href="https://wiki.facepunch.com/gmod/">Garry’s Mod Wiki</a></li>
+      </ul>
+    </nav>
+    <main class="article"><nav class="article-tabs" aria-label="Documentation"><a href="index.html" data-ru="Обзор">Overview</a><a href="index.html#Features" data-ru="Инструменты">Tools</a><a href="changelog.html" data-ru="Изменения">Changelog</a><a href="index.html#Download" data-ru="Установка">Installation</a></nav><div class="article-header"><h1><img class="title-icon" alt="" src="assets/icons/editor/materials.svg"><span data-ru="Материалы и живой цвет">Materials and live colour</span></h1><div class="languages"><button data-language="en" aria-pressed="true">English</button><button data-language="ru" aria-pressed="false">Русский</button></div></div><p data-ru="Руководство по текущей разработке — публичная загрузка приостановлена. Статус выпусков указан в Changelog.">Development guide — public downloads are currently paused. See Changelog for release status.</p><p data-ru="Ищи ассеты в нижней панели, применяй материал к брашам или заменяй модель пропа двойным кликом. Face настраивает UV-векторы, масштаб, сдвиг, поворот и плотность лайтмапы. Material Editor объединяет граф, VMT-текст и превью; изменение цвета видно до Apply.">Find assets in the docked browser, apply a material to selected brushes, or replace a prop model with a double-click. Face controls expose UV vectors, scale, shift, rotation and lightmap density. Material Editor combines a node view, editable VMT text and a shaded preview; colour changes can be previewed before Apply.</p><h2 data-ru="Порядок работы">Workflow</h2><ol class="guide-steps"><li data-ru="Двойной клик по материалу в Assets применяет его к выбранным брашам. Face → Material содержит масштаб, сдвиг, поворот, выравнивание UV и плотность лайтмапы.">Double-click a material in Assets with brushes selected to apply it. Face → Material provides UV scale, shift, rotation, alignment and lightmap density.</li><li data-ru="В VMT text кнопки Phong, Reflections и Bumpmap комментируют или восстанавливают ключи через //, сохраняя значения. Save записывает текст; Revert восстанавливает файл.">VMT text has Phong, Reflections and Bumpmap switches. They comment or restore the relevant keys with // while retaining their previous values. Save writes the edited text; Revert restores the file.</li><li data-ru="Кнопка цвета открывает HSV/RGB/HEX. Цвет сразу виден на объекте. Cancel возвращает исходный вид; Apply создаёт одну отменяемую правку.">The colour button opens HSV/RGB/HEX controls. Changes preview on the selected object immediately. Cancel restores the original appearance; Apply creates one undoable edit.</li></ol><figure class="guide-shot panel-shot"><button class="image-open" data-image="assets/face-mixed-groups.png" aria-label="Face material controls with mixed smoothing-group assignments."><img loading="lazy" src="assets/face-mixed-groups.png" alt="Face material controls with mixed smoothing-group assignments."></button><figcaption data-ru="Параметры материала со смешанными назначениями групп сглаживания.">Face material controls with mixed smoothing-group assignments.</figcaption></figure><footer class="article-footer"><a href="index.html#Features" data-ru="Все инструменты">All tools</a> · <a href="changelog.html" data-ru="Изменения">Changelog</a></footer></main></div></body></html>

@@ -44,8 +44,8 @@ async function loadBeta() {
 
     document.querySelectorAll('[data-beta-download]').forEach(link => link.href = installer);
     document.querySelectorAll('[data-beta-version]').forEach(label => label.textContent = release.version);
-    document.querySelector('[data-beta-size]').textContent = (release.bytes / 1_000_000).toFixed(1) + ' MB';
-    document.querySelector('[data-beta-release]').href = releases + '/tag/' + tag;
+    document.querySelectorAll('[data-beta-size]').forEach(label => label.textContent = (release.bytes / 1_000_000).toFixed(1) + ' MB');
+    document.querySelectorAll('[data-beta-release]').forEach(link => link.href = releases + '/tag/' + tag);
   } catch {
     // Download links still point to the release list.
   }
