@@ -164,3 +164,21 @@ pre { max-width:100%; padding:14px; margin:12px 0 20px; overflow-x:auto; border:
 pre code { overflow-wrap:normal; white-space:pre; }
 .article > .guide-shot { margin:16px 0 24px; }
 .article > .gallery .guide-shot { margin:0; }
+
+/* NoDraw branding and screenshots belong to the feature they demonstrate. */
+.product-banner { margin:16px 0 26px; max-width:1080px; }
+.product-banner img { width:100%; height:auto; }
+.title-icon { width:30px; height:30px; image-rendering:auto; }
+.feature-grid { display:block; }
+.feature { padding:24px 0; }
+.feature-demonstrated { display:grid; grid-template-columns:minmax(230px,.7fr) minmax(0,1.3fr); gap:24px; align-items:start; }
+.feature h3 { margin-top:0; }
+.feature h3 img { width:30px; height:30px; }
+.feature-copy > p { margin:8px 0; }
+.image-viewer > a { display:inline-block; padding:5px 4px 12px; }
+.feature-example { margin:14px 0 28px; }
+.feature-demonstrated > .feature-example { margin:0; }
+.feature-text { max-width:95ch; }
+.infobox .feature-example { margin:8px 0 12px; border:0; padding:0; }
+.infobox .feature-example figcaption { font-size:11px; }
+@media(max-width:950px) { .feature-demonstrated { grid-template-columns:1fr; gap:10px; } }

@@ -60,12 +60,17 @@ const closeImage = document.createElement('button');
 closeImage.type = 'button';
 closeImage.textContent = 'Close / Закрыть';
 const fullImage = document.createElement('img');
-imageViewer.append(closeImage, fullImage);
+const fullImageLink = document.createElement('a');
+fullImageLink.textContent = 'Full size / Полный размер';
+fullImageLink.target = '_blank';
+fullImageLink.rel = 'noopener';
+imageViewer.append(closeImage, fullImageLink, fullImage);
 document.body.append(imageViewer);
 closeImage.addEventListener('click', () => imageViewer.close());
 for (const button of document.querySelectorAll('[data-image]')) {
   button.addEventListener('click', () => {
     fullImage.src = button.dataset.image;
+    fullImageLink.href = button.dataset.image;
     fullImage.alt = button.getAttribute('aria-label') || '';
     imageViewer.showModal();
   });
