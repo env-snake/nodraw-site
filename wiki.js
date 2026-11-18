@@ -52,3 +52,21 @@ async function loadBeta() {
 }
 
 loadBeta();
+
+// A native dialog provides focus trapping and Escape without a dependency.
+const imageViewer = document.createElement('dialog');
+imageViewer.className = 'image-viewer';
+const closeImage = document.createElement('button');
+closeImage.type = 'button';
+closeImage.textContent = 'Close / Закрыть';
+const fullImage = document.createElement('img');
+imageViewer.append(closeImage, fullImage);
+document.body.append(imageViewer);
+closeImage.addEventListener('click', () => imageViewer.close());
+for (const button of document.querySelectorAll('[data-image]')) {
+  button.addEventListener('click', () => {
+    fullImage.src = button.dataset.image;
+    fullImage.alt = button.getAttribute('aria-label') || '';
+    imageViewer.showModal();
+  });
+}
