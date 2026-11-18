@@ -159,3 +159,8 @@ h3 { margin: 17px 0 5px; font-size: 15px; color: #ededed; }
 .panel-shot { max-width:454px; }
 .panel-shot .image-open { max-height:600px; overflow:hidden; }
 .panel-shot .image-open img { width:100%; height:auto; }
+
+pre { max-width:100%; padding:14px; margin:12px 0 20px; overflow-x:auto; border:1px solid var(--line); background:#1b1e20; line-height:1.6; }
+pre code { overflow-wrap:normal; white-space:pre; }
+.article > .guide-shot { margin:16px 0 24px; }
+.article > .gallery .guide-shot { margin:0; }
