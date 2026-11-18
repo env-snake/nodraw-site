@@ -27,7 +27,7 @@
         <li><a href="#Compile" data-ru="Компиляция">Compiling a map</a></li>
         <li><a href="#Hotkeys" data-ru="Горячие клавиши">Keyboard shortcuts</a></li>
       </ul>
-      <p data-ru="Категории">Categories</p><ul class="category-grid"><li><a href="#Features" data-ru="Все инструменты">All tools</a></li><li><a href="#Gallery" data-ru="Галерея">Gallery</a></li><li><a href="#Updates" data-ru="Версии и изменения">Versions and changes</a></li></ul>
+      <p data-ru="Категории">Categories</p><ul class="category-grid"><li><a href="#Features" data-ru="Все инструменты">All tools</a></li><li><a href="#Features" data-ru="Галерея">Gallery</a></li><li><a href="#Updates" data-ru="Версии и изменения">Versions and changes</a></li></ul>
       <p data-ru="Ресурсы">Resources</p>
       <ul>
         <li><a href="https://github.com/env-snake/nodraw-site/releases" data-ru="Выпуски">Releases</a></li>
@@ -58,7 +58,7 @@
               <li><a href="#Hotkeys" data-ru="Горячие клавиши">Keyboard shortcuts</a></li>
               <li><a href="#MCP" data-ru="Интеграция с MCP">MCP integration</a></li>
               <li><a href="#Features" data-ru="Инструменты подробнее">Tools in detail</a></li>
-              <li><a href="#Gallery" data-ru="Интерфейс и примеры">Interface and examples</a></li>
+              <li><a href="#Features" data-ru="Интерфейс и примеры">Interface and examples</a></li>
               <li><a href="#Updates" data-ru="Версии и изменения">Versions and changes</a></li>
               <li><a href="#Help" data-ru="Частые вопросы">Common questions</a></li>
             </ol>
@@ -66,14 +66,9 @@
         </div>
         <aside class="infobox" aria-labelledby="infobox-heading">
           <h2 id="infobox-heading">NoDraw</h2>
-          <figure>
-            <a href="assets/nodraw_ui_main.png" aria-label="Open the full-size NoDraw screenshot">
-              <img src="assets/nodraw_ui_main.png" alt="NoDraw editor showing camera, top, front, and side views" width="1920" height="1050">
-            </a>
-            <figcaption data-ru="Рабочая область NoDraw">NoDraw editor workspace</figcaption>
-          </figure>
+          
           <dl>
-            <dt data-ru="Версия">Build</dt><dd data-beta-version>—</dd>
+            <dt data-ru="Версия">Build</dt><dd data-beta-version>Paused</dd>
             <dt data-ru="Система">Platform</dt><dd>Windows x64</dd>
             <dt data-ru="Движок">Engine</dt><dd>Source 1</dd>
             <dt data-ru="Карты">Maps</dt><dd>VMF, BSP</dd>
@@ -81,23 +76,17 @@
             <dt data-ru="Разработчик">Developer</dt><dd>env_snake</dd>
           </dl>
           <div class="infobox-download">
-            <a class="download-action" href="https://github.com/env-snake/nodraw-site/releases" data-beta-download>
-              <img src="assets/icons/nodraw/toolbar_compile.png" alt="">
-              <span data-ru="Скачать бету">Download beta</span>
-            </a>
+            
           </div>
         </aside>
       </div>
 
       <section class="article-section" id="Download">
-        <h2 data-ru="Установка и запуск">Installing and launching</h2>
+        <h2 data-ru="Установка и запуск">Installing and launching</h2><p class="notice" data-ru="Публичная загрузка временно приостановлена на время проверки содержимого. Предыдущие пакеты сняты с публикации; новая проверенная сборка появится здесь.">Public downloads are temporarily paused for a content audit. Previous packages have been unpublished; a newly verified build will appear here.</p>
         <p data-ru="Установщик NoDraw для Windows x64 ставит редактор для текущего пользователя и добавляет ярлык в меню «Пуск».">The NoDraw installer for Windows x64 installs the editor for your user account and adds a Start menu shortcut.</p>
-        <a class="download-action" href="https://github.com/env-snake/nodraw-site/releases" data-beta-download>
-          <img src="assets/icons/nodraw/toolbar_compile.png" alt="">
-          <span data-ru="Скачать NoDraw-Setup.exe">Download NoDraw-Setup.exe</span>
-        </a>
+        
         <dl class="package">
-          <div><dt data-ru="Текущая бета">Current beta</dt><dd data-beta-version>—</dd></div>
+          <div><dt data-ru="Текущая бета">Current beta</dt><dd data-beta-version>Paused</dd></div>
           <div><dt data-ru="Размер файла">File size</dt><dd data-beta-size>—</dd></div>
           <div><dt data-ru="Заметки к выпуску">Release notes</dt><dd><a href="https://github.com/env-snake/nodraw-site/releases" data-beta-release data-ru="Выпуск на GitHub">Release on GitHub</a></dd></div>
         </dl>
@@ -168,11 +157,7 @@
         <p data-ru="Краткий справочник рабочих сценариев. Это возможности ветки разработки; отдельные улучшения могут требовать сборку новее публичной беты. Актуальный установщик указан выше.">A practical guide to the development branch. Some improvements may require a build newer than the public beta; the available installer is listed above.</p>
         <div class="feature-grid"><article class="feature"><h3><img src="assets/icons/nodraw/tool_mesh.png" width="28" height="28" alt=""><span data-ru="Редактирование брашей">Brush modelling</span></h3><p data-ru="Редактируй вершины, рёбра и грани прямо на карте. Inset переключается между Region и Individual; Hollow создаёт полую оболочку из брашей, Bridge соединяет выбранные грани с настройкой сегментов и сторон сечения. Результат виден до применения.">Edit vertices, edges and faces directly in the map. Inset switches between Region and Individual; Hollow creates a brush shell, and Bridge joins selected faces with adjustable segments and cross-section sides. Preview the result before applying it.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/tool_disp.png" width="28" height="28" alt=""><span data-ru="Дисплейсменты и дороги">Displacements and roads</span></h3><p data-ru="Лепи рельеф и рисуй смешивание материалов в редакторе. Auto-sew поддерживает общие края; переключатель находится в Select → Displacements. Path Tool создаёт дороги с настройкой ширины, высоты и blend или меняет существующие диспы.">Sculpt terrain and paint material blends without leaving the editor. Auto-sew maintains shared edges; its toggle is available in Select → Displacements. Path Tool builds road ribbons with width, elevation and blend controls, or reshapes existing displacement surfaces.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/toolbar_rotate.png" width="28" height="28" alt=""><span data-ru="Выделение, трансформации и X-Ray">Selection, transforms and X-Ray</span></h3><p data-ru="Выделяй прямоугольником или Lasso в 2D и 3D. Mesh X-Ray позволяет выбирать сквозь редактируемый объект. Окно Transform запоминает операцию и значения; Duplicate показывает ряды, круги и спирали. Move to Floor настраивает погружение, уклон и игнорирование пропов.">Use a rectangle or Lasso in 2D and 3D. Mesh X-Ray lets selections pass through the edited object. The transform window retains the previous operation and values; Duplicate previews rows, circles and spirals. Move to Floor supports burial depth, slope alignment and prop filtering.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/asset_model.png" width="28" height="28" alt=""><span data-ru="Propper и исходники моделей">Propper and model sources</span></h3><p data-ru="Превращай геометрию карты в модель с сохранением смешивания материалов и UV. Сохраняй исходные LOD или создавай упрощённые уровни с настройкой порогов. Model Viewer показывает скины и LOD, декомпилирует QC/SMD и собирает модель; для правки геометрии доступен Blender.">Convert map geometry into a compiled model, preserving material blends and UVs. Keep source LODs or generate simplified levels with adjustable thresholds. Model Viewer provides skin and LOD previews, QC/SMD decompilation and recompilation, with a route to Blender for mesh editing.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/asset_material.png" width="28" height="28" alt=""><span data-ru="Материалы и живой цвет">Materials and live colour</span></h3><p data-ru="Ищи ассеты в нижней панели, применяй материал к брашам или заменяй модель пропа двойным кликом. Face настраивает UV-векторы, масштаб, сдвиг, поворот и плотность лайтмапы. Material Editor объединяет граф, VMT-текст и превью; изменение цвета видно до Apply.">Find assets in the docked browser, apply a material to selected brushes, or replace a prop model with a double-click. Face controls expose UV vectors, scale, shift, rotation and lightmap density. Material Editor combines a node view, editable VMT text and a shaded preview; colour changes can be previewed before Apply.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/toolbar_lighting.png" width="28" height="28" alt=""><span data-ru="Превью света и неба">Lighting and sky preview</span></h3><p data-ru="Проверяй свет во вьюпорте с уточнением в фоне. Локальные правки используют предыдущий расчёт и обновляют затронутые поверхности. Превью неба включает скайбокс, туман и направление солнца. Финальный результат проверяй в игре на собранном BSP.">Inspect lighting in the viewport and refine it in the background. Local edits reuse the existing bake and update affected surfaces. Sky preview includes the skybox, fog and sun direction. This is an editor preview: use a compiled BSP in the game to judge the final result.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/toolbar_compile.png" width="28" height="28" alt=""><span data-ru="Компиляция и диагностика">Compilation and diagnostics</span></h3><p data-ru="Настраивай BSP, видимость и свет в панели Compile. Для GPU-компиляции есть отдельное окно с прогрессом, Stop и Problems. Готовый журнал возвращается в NoDraw с фильтрами, объяснениями и переходами к координатам карты.">Configure BSP, visibility and lighting stages in the Compile panel. GPU compilation uses an independent window with progress, Stop and Problems. The finished log returns to NoDraw with filters, explanations and links to map coordinates, so diagnosing a build stays part of the editing workflow.</p></article><article class="feature"><h3><img src="assets/icons/nodraw/ui_pack.png" width="28" height="28" alt=""><span data-ru="Работа с проектом">Project workflow</span></h3><p data-ru="Организуй карту через User и Auto VisGroups, меняй сущности в Properties и проверяй зависимости инструментами Pack. Welcome открывает недавние карты и автосохранения. Локальный MCP-интерфейс позволяет подключённым инструментам изучать и редактировать карту.">Organise the map with User and Auto VisGroups, inspect entities in Properties, and use the Pack tools for map dependencies. Welcome provides recent maps and autosave recovery. The local MCP interface supports inspection and editing from connected tools.</p></article></div>
       </section>
-      <section class="article-section" id="Gallery">
-        <h2 data-ru="Интерфейс и примеры">Interface and examples</h2>
-        <p data-ru="Нажми на изображение, чтобы открыть его целиком. Escape закрывает просмотр.">Select an image to view it at full size. Press Escape to close.</p>
-        <div class="gallery">
-<figure><button class="image-open" type="button" aria-label="The editor workspace and orthographic views" data-image="assets/nodraw_ui_main.png"><img loading="lazy" src="assets/nodraw_ui_main.png" alt="The editor workspace and orthographic views" width="1600" height="1000"></button><figcaption><span data-ru="Рабочая область и ортографические виды">The editor workspace and orthographic views</span></figcaption></figure><figure><button class="image-open" type="button" aria-label="Lighting Preview in a map viewport" data-image="assets/shot_light.png"><img loading="lazy" src="assets/shot_light.png" alt="Lighting Preview in a map viewport" width="1600" height="1000"></button><figcaption><span data-ru="Lighting Preview во вьюпорте карты">Lighting Preview in a map viewport</span></figcaption></figure><figure><button class="image-open" type="button" aria-label="Model Viewer: layout and geometry statistics, next build" data-image="assets/model-viewer.png"><img loading="lazy" src="assets/model-viewer.png" alt="Model Viewer: layout and geometry statistics, next build" width="1600" height="1000"></button><figcaption><span data-ru="Model Viewer: компоновка и статистика геометрии, следующая сборка">Model Viewer: layout and geometry statistics, next build</span></figcaption></figure><figure><button class="image-open" type="button" aria-label="Material graph and VMT feature switches, next build" data-image="assets/material-editor.png"><img loading="lazy" src="assets/material-editor.png" alt="Material graph and VMT feature switches, next build" width="1600" height="1000"></button><figcaption><span data-ru="Граф материала и переключатели VMT, следующая сборка">Material graph and VMT feature switches, next build</span></figcaption></figure></div></section>
+      
       <section class="article-section" id="Updates">
         <h2 data-ru="Версии и изменения">Versions and changes</h2>
         <h3>0.1.0 beta 3 <span class="tag" data-ru="Публичная сборка">Public release</span></h3>

@@ -1,8 +1,0 @@
-{
-  "build": 3,
-  "version": "0.1.0 beta 3",
-  "notes": "New NoDraw styling for the independent GPU compile window and a fix for HTTPS update checks. If you are using beta 2, download and run this installer once to enable future in-editor updates.",
-  "installer": "https://github.com/env-snake/nodraw-site/releases/download/v0.1.0-beta.3/NoDraw-Setup.exe",
-  "sha256": "88ab7c6b1d4626bbe12642a46de6857f8846aa66a715b166330b3d03d4202682",
-  "bytes": 16601278
-}
