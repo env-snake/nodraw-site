@@ -1,0 +1,8 @@
+{
+  "build": 4,
+  "version": "0.1.0 beta 4",
+  "notes": "NoDraw 0.1.0 beta 4 — Windows x64 test build\n\n- Includes the latest brush editing, displacement, model-viewer and material workflow fixes.\n- Restores movable/resizable transform windows and retained Ctrl+M values.\n- Adds autosave recovery with validated camera and object-selection metadata.\n- Includes X-Ray and displacement-wireframe shortcuts, live operation previews and improved asset replacement.\n- Model Viewer supports static QC/SMD sources, Blender handoff, skins, collision and LOD inspection.\n- Standard Source content is supported. Game assets and map compilers are not included.\n- Installs per user without administrator rights. Installed builds check for future updates and show a Yes/No prompt; downloading and installing requires your choice.\n\nThis is a test build. Keep a backup of maps before testing. Report the version, reproduction steps and a relevant screenshot or compile log.\n\nFull documentation and illustrated workflows: https://env-snake.github.io/nodraw-site/",
+  "installer": "https://github.com/env-snake/nodraw-site/releases/download/v0.1.0-beta.4/NoDraw-Setup.exe",
+  "sha256": "74c59f0aeea1f61d1db53bb866b38db524e8e1ee7ad5fe26b95016c8571218b4",
+  "bytes": 15530831
+}

@@ -37,7 +37,8 @@ async function loadBeta() {
     const release = await response.json();
     const version = /^(\d+\.\d+\.\d+) beta ([1-9]\d*)$/.exec(release.version);
     if (!version || !Number.isSafeInteger(release.build) || Number(version[2]) !== release.build ||
-        !Number.isSafeInteger(release.bytes) || release.bytes <= 0) return;
+        !Number.isSafeInteger(release.bytes) || release.bytes <= 0 ||
+        !/^[a-f0-9]{64}$/i.test(release.sha256)) return;
     const tag = 'v' + version[1] + '-beta.' + release.build;
     const installer = releases + '/download/' + tag + '/NoDraw-Setup.exe';
     if (release.installer !== installer) return;
@@ -45,6 +46,7 @@ async function loadBeta() {
     document.querySelectorAll('[data-beta-download]').forEach(link => link.href = installer);
     document.querySelectorAll('[data-beta-version]').forEach(label => label.textContent = release.version);
     document.querySelectorAll('[data-beta-size]').forEach(label => label.textContent = (release.bytes / 1_000_000).toFixed(1) + ' MB');
+    document.querySelectorAll('[data-beta-sha]').forEach(label => label.textContent = release.sha256);
     document.querySelectorAll('[data-beta-release]').forEach(link => link.href = releases + '/tag/' + tag);
   } catch {
     // Download links still point to the release list.
